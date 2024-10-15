@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "583246845024",
+    "project_id": "pg-finding-app-67303",
+    "storage_bucket": "pg-finding-app-67303.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583246845024:android:57f911242c23412fe59f05",
+        "android_client_info": {
+          "package_name": "com.example.pg_finding"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583246845024-bg7u7jv8eoad8u2o4r9hfse5op794s3m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pg_finding",
+            "certificate_hash": "0791231803d58a255ef31ace29960a8801392c17"
+          }
+        },
+        {
+          "client_id": "583246845024-s0tq41ift288jd8vfqgnpfr3jchc1jjh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxeBDXUOch4Cl9mpR7x-ozCLvFcsUCt1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583246845024-s0tq41ift288jd8vfqgnpfr3jchc1jjh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "583246845024-ilnnrmt3spjhbcldqc9k2jib0bpfr74j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pgFinding"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

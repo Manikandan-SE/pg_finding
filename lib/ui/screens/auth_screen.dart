@@ -1,12 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:phone_email_auth/phone_email_auth.dart';
 
 import '../../utils/index.dart';
-import '../widgets/index.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  FirebaseAuth auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     TextEditingController textEditingController = TextEditingController();
@@ -84,7 +91,7 @@ class AuthScreen extends StatelessWidget {
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
-                        MobileNumberFormatter(),
+                        // MobileNumberFormatter(),
                         LengthLimitingTextInputFormatter(
                           10,
                         ),
@@ -99,11 +106,38 @@ class AuthScreen extends StatelessWidget {
                   SizedBox(
                     height: context.height * 0.05,
                   ),
-                  AppElevatedButton(
-                    buttonText: sendOtp,
-                    width: context.width * 0.5,
-                    onPressed: () {},
+                  PhoneLoginButton(
+                    borderRadius: 10,
+                    buttonColor: Colors.teal,
+                    label: 'Login with Phone',
+                    onSuccess: (String accessToken, String jwtToken) {
+                      if (accessToken.isNotEmpty) {
+                        // setState(() {
+                        //   useraccessToken = accessToken;
+                        //   jwtUserToken = jwtToken;
+                        //   hasUserLogin = true;
+                        // });
+                      }
+                    },
                   ),
+                  // AppElevatedButton(
+                  //   buttonText: sendOtp,
+                  //   width: context.width * 0.5,
+                  //   onPressed: () async {
+                  //     await auth.verifyPhoneNumber(
+                  //       phoneNumber: '+917904696681',
+                  //       verificationCompleted:
+                  //           (PhoneAuthCredential credential) {},
+                  //       codeSent: (verificationId, forceResendingToken) {
+                  //         print('verificationId$verificationId');
+                  //       },
+                  //       codeAutoRetrievalTimeout: (verificationId) {},
+                  //       verificationFailed: (FirebaseAuthException error) {
+                  //         print('auth error $error');
+                  //       },
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

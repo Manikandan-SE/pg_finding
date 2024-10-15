@@ -1,23 +1,37 @@
-// import 'package:firebase_core/firebase_core.dart';
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pg_finding/utils/index.dart';
+import 'package:phone_email_auth/phone_email_auth.dart';
 
-// import 'firebase_options.json';
 import 'router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await SharedPreferencesUtils.init();
+  Platform.isAndroid
+      ? await Firebase.initializeApp(
+          options: const FirebaseOptions(
+            apiKey: 'AIzaSyDxeBDXUOch4Cl9mpR7x-ozCLvFcsUCt1k',
+            appId: '1:583246845024:android:57f911242c23412fe59f05',
+            messagingSenderId: '583246845024',
+            projectId: 'pg-finding-app-67303',
+          ),
+        )
+      : await Firebase.initializeApp();
+  PhoneEmail.initializeApp(
+    clientId: '13230232040355246216',
+  );
   SystemChrome.setPreferredOrientations(
     [
       DeviceOrientation.portraitUp,
     ],
   );
-  runApp(const PgFindingApp());
+  runApp(
+    const PgFindingApp(),
+  );
 }
 
 class PgFindingApp extends StatelessWidget {
@@ -26,19 +40,22 @@ class PgFindingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pg Finding App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'FiraSansExtraCondensed',
-        useMaterial3: true,
-      ),
-      // home: const SplashScreen(),
-      onGenerateRoute: AppRouter.generateRoute,
-      initialRoute: splashRoute,
-    );
+        title: 'Pg Finding App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'FiraSansExtraCondensed',
+          useMaterial3: true,
+        ),
+        // home: const SplashScreen(),
+        onGenerateRoute: AppRouter.generateRoute,
+        initialRoute:
+            //  getUserData() != null ?
+            pgRoute
+        //  :
+        //  initRoute,
+        );
   }
 }
-
 
 //Firebase
 

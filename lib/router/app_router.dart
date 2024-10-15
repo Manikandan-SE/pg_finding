@@ -6,10 +6,14 @@ import '../utils/index.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case splashRoute:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
-      case authRoute:
-        return MaterialPageRoute(builder: (_) => const AuthScreen());
+      case initRoute:
+        return MaterialPageRoute(
+          builder: (_) => const InitScreen(),
+        );
+      case pgRoute:
+        return MaterialPageRoute(
+          builder: (_) => const PGScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

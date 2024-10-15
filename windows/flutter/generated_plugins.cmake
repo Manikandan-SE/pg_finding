@@ -4,7 +4,9 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
-  geolocator_windows
+  firebase_auth
+  firebase_core
+  flutter_udid
   url_launcher_windows
 )
 
