@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
@@ -26,9 +27,9 @@ class _PGScreenState extends State<PGScreen> {
   void initState() {
     super.initState();
     _getCurrentPosition();
-    // WidgetsBinding.instance.addPostFrameCallback(
-    //   (_) => _getCurrentPosition(),
-    // );
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) async => await fetchLocationUpdates(),
+    );
   }
 
   Future<void> _getCurrentPosition() async {
@@ -98,11 +99,31 @@ class _PGScreenState extends State<PGScreen> {
       geocoding.Placemark place = placemarks[0];
       print('address ${jsonEncode(place)}');
       currentAddress =
-          '${place.subLocality != null && place.subLocality!.isNotEmpty ? '${place.subLocality},' : ''} ${place.locality != null && place.locality!.isNotEmpty ? '${place.locality},' : ''} ${place.postalCode != null && place.postalCode!.isNotEmpty ? '${place.postalCode},' : ''} TN'
+          '${place.subLocality != null && place.subLocality!.isNotEmpty ? '${place.subLocality},' : ''} ${place.locality != null && place.locality!.isNotEmpty ? '${place.locality},' : ''} ${place.postalCode != null && place.postalCode!.isNotEmpty ? '${place.postalCode},' : ''} Tamilnadu'
               .trim(); //${place.administrativeArea}
       setState(() {});
     }).catchError((e) {
-      debugPrint(e);
+      if (e is PlatformException) {
+        print("PlatformException occurred: ${e.message}");
+      } else {
+        print("Unexpected error: $e");
+      }
+    });
+  }
+
+  Future<void> fetchLocationUpdates() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
+        setState(() {
+          _getAddressFromLatLng(
+            latitude: currentLocation.latitude!,
+            longitude: currentLocation.longitude!,
+          );
+        });
+      }
     });
   }
 
@@ -175,8 +196,8 @@ class _PGScreenState extends State<PGScreen> {
           MapScreen(
             locationData: locationData,
           ),
-          const Text('Saved PG'),
-          const Text('Bookings'),
+          const SavedPgScreen(),
+          const BookingsScreen(),
         ],
       ),
       bottomNavigationBar: Container(

@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_info_window/custom_info_window.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -25,6 +27,7 @@ class _MapScreenState extends State<MapScreen> {
   BitmapDescriptor pgIcon = BitmapDescriptor.defaultMarker;
 
   Set<Marker> markers = {};
+  Map<PolylineId, Polyline> polylines = {};
 
   @override
   void initState() {
@@ -64,16 +67,21 @@ class _MapScreenState extends State<MapScreen> {
           ),
           icon: markerIcon,
           position: position,
-          onTap: () {
+          onTap: () async {
             if (customInfoWindowController.addInfoWindow != null) {
               customInfoWindowController.addInfoWindow!(
-                Container(
-                  child: Text(
-                    latlngPoint[i].toString(),
-                  ),
-                ),
+                const PgWindowView(),
                 position,
               );
+              // final coordinates = await fetchPolylinePoints(
+              //   destination: position,
+              // );
+              final coordinates = await fetchPolylineFromOSRM(
+                myCurrentPosition,
+                position,
+              );
+              print('osrm res $coordinates');
+              generatePolylineFromPoints(coordinates);
             }
           },
         ),
@@ -93,18 +101,97 @@ class _MapScreenState extends State<MapScreen> {
             pgIcon = icon;
           },
         );
+        displayInfo(pgIcon: pgIcon, userIcon: userIcon);
       },
     );
-    BitmapDescriptor.asset(const ImageConfiguration(), userMarker,).then(
+    BitmapDescriptor.asset(
+      const ImageConfiguration(),
+      userMarker,
+    ).then(
       (icon) {
         setState(
           () {
             userIcon = icon;
           },
         );
+        displayInfo(pgIcon: pgIcon, userIcon: userIcon);
       },
     );
-    displayInfo(pgIcon: pgIcon, userIcon: userIcon);
+  }
+
+  // Future<List<LatLng>> fetchPolylinePoints(
+  //     {required LatLng destination}) async {
+  //   try {
+  //     final polylinePoints = PolylinePoints();
+  //     final result = await polylinePoints.getRouteBetweenCoordinates(
+  //       googleApiKey: googleMapApiKey,
+  //       request: PolylineRequest(
+  //         origin: PointLatLng(
+  //           myCurrentPosition.latitude,
+  //           myCurrentPosition.longitude,
+  //         ),
+  //         destination: PointLatLng(
+  //           destination.latitude,
+  //           destination.longitude,
+  //         ),
+  //         mode: TravelMode.driving,
+  //         wayPoints: [
+  //           PolylineWayPoint(
+  //             location: "Sabo, Yaba Lagos Nigeria",
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //     if (result.points.isNotEmpty) {
+  //       print('mappoints ${result.points}');
+  //       return result.points
+  //           .map(
+  //             (point) => LatLng(
+  //               point.latitude,
+  //               point.longitude,
+  //             ),
+  //           )
+  //           .toList();
+  //     } else {
+  //       debugPrint('maperror ${result.errorMessage}');
+  //       return [];
+  //     }
+  //   } catch (e) {
+  //     print('maperror $e');
+  //     return [];
+  //   }
+  // }
+
+  Future<List<LatLng>> fetchPolylineFromOSRM(LatLng start, LatLng end) async {
+    final dio = Dio();
+    final url = 'https://router.project-osrm.org/route/v1/driving/'
+        '${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson';
+
+    final response = await dio.get(url);
+    if (response.statusCode == 200) {
+      final decodedData = response.data;
+      final polyline = decodedData['routes'][0]['geometry']['coordinates'];
+
+      return polyline.map<LatLng>((point) {
+        return LatLng(
+            point[1], point[0]); // GeoJSON format is [longitude, latitude]
+      }).toList();
+    } else {
+      throw Exception('Failed to fetch polyline');
+    }
+  }
+
+  Future<void> generatePolylineFromPoints(
+      List<LatLng> polylineCoordinates) async {
+    const id = PolylineId("poly");
+    Polyline polyline = Polyline(
+      polylineId: id,
+      color: Colors.red,
+      points: polylineCoordinates,
+      width: 5,
+    );
+    polylines[id] = polyline;
+    setState(() {});
   }
 
   @override
@@ -116,7 +203,7 @@ class _MapScreenState extends State<MapScreen> {
             myLocationButtonEnabled: false,
             initialCameraPosition: CameraPosition(
               target: myCurrentPosition,
-              zoom: 14,
+              zoom: 16,
             ),
             markers: markers,
             onMapCreated: (controller) {
@@ -133,12 +220,13 @@ class _MapScreenState extends State<MapScreen> {
                 customInfoWindowController.onCameraMove!();
               }
             },
+            polylines: Set<Polyline>.of(polylines.values),
           ),
           CustomInfoWindow(
             controller: customInfoWindowController,
-            height: 200,
-            width: 250,
-            offset: 50,
+            height: 150,
+            width: 200,
+            offset: 70,
           ),
         ],
       ),
@@ -149,7 +237,7 @@ class _MapScreenState extends State<MapScreen> {
             CameraUpdate.newCameraPosition(
               CameraPosition(
                 target: myCurrentPosition,
-                zoom: 14,
+                zoom: 16,
               ),
             ),
           );
@@ -160,6 +248,68 @@ class _MapScreenState extends State<MapScreen> {
           Icons.my_location,
           size: 30,
         ),
+      ),
+    );
+  }
+}
+
+class PgWindowView extends StatelessWidget {
+  const PgWindowView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(
+          10,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(
+              10,
+            ),
+            child: CachedNetworkImage(
+              width: double.infinity,
+              height: context.height * 0.1,
+              fit: BoxFit.cover,
+              imageUrl:
+                  "https://lh3.googleusercontent.com/p/AF1QipNqVC0y-ddz88RrR7UhllUgpwfVMMK72-D_-6KO=s1360-w1360-h1020",
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'VENKATESWARA PG GENTS',
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  'HOSTEL NO 87/16 VENKATESWARA NAGAR 3RD MAIN ROAD VELACHERY ROAD',
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: Colors.grey.shade400,
+                    overflow: TextOverflow.ellipsis,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

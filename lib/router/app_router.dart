@@ -14,6 +14,14 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const PGScreen(),
         );
+      case searchRoute:
+        return MaterialPageRoute(
+          builder: (_) => const PgSearchScreen(),
+        );
+      case pgDetailsRoute:
+        return MaterialPageRoute(
+          builder: (_) => const PgDetailsScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
