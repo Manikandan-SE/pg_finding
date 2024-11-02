@@ -1,4 +1,5 @@
 export 'auth_screen.dart';
+export 'booking_details_screen.dart';
 export 'init_screen.dart';
 export 'pg_details_screen.dart';
 export 'pg_screen.dart';

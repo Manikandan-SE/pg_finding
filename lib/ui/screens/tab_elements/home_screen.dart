@@ -442,7 +442,7 @@ class BrowseByLocality extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: context.height * 0.25,
+          height: context.height * 0.26,
           child: ListView(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,

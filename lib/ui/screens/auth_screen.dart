@@ -31,9 +31,9 @@ class _AuthScreenState extends State<AuthScreen> {
                 color: blueBackground,
                 width: double.infinity,
                 height: context.height * 0.5,
-                child: Image.asset(
-                  authImg,
-                ),
+                // child: Image.asset(
+                //   authImg,
+                // ),
               ),
             ),
           ),

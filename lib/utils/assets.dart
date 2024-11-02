@@ -1,5 +1,4 @@
 const String splashScreenGif = 'assets/app_logo.gif';
-const String authImg = 'assets/auth.jpg';
 const String animatedLogo = 'assets/app-logo-animation-vid.mp4';
 const String appLogoLottie = 'assets/app-logo-animation-vid.mp4.lottie.json';
 const String appLogo = 'assets/app-logo-png.png';
@@ -15,3 +14,6 @@ const String fridge = 'assets/fridge.png';
 const String fingerPrint = 'assets/fingerprint.png';
 const String water = 'assets/water.png';
 const String washingMachine = 'assets/washing-machine.png';
+const String pgOwner = 'assets/pg-owner.png';
+const String call = 'assets/call.png';
+const String booking = 'assets/booking.png';

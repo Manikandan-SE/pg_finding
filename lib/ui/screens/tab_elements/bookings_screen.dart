@@ -53,7 +53,7 @@ class BookingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: context.height * 0.17,
+      height: context.height * 0.19,
       decoration: BoxDecoration(
         color: Colors.white,
         // boxShadow: [
@@ -244,7 +244,11 @@ class BookingsCard extends StatelessWidget {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).pushNamed(
+                                  bookingDetailsRoute,
+                                );
+                              },
                               child: const Text(
                                 "View Details",
                                 style: TextStyle(

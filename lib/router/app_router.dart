@@ -22,6 +22,10 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const PgDetailsScreen(),
         );
+      case bookingDetailsRoute:
+        return MaterialPageRoute(
+          builder: (_) => const BookingDetailsScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

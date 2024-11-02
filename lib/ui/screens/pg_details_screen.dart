@@ -87,14 +87,18 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
 
   void goToDestination() async {
     try {
-      const double destinationLatitude = 10.8708031;
-      const double destinationLongitude = 78.6455469;
-      final uri = Uri(
-          scheme: "google.navigation",
-          // host: '"0,0"',  {here we can put host}
-          queryParameters: {
-            'q': '$destinationLatitude, $destinationLongitude'
-          });
+      const double destinationLatitude = 12.97142854321849;
+      const double destinationLongitude = 80.18270049618685;
+      // final uri = Uri(
+      //     scheme: "google.navigation",
+      //     // host: '"0,0"',  {here we can put host}
+      //     queryParameters: {
+      //       'q': '$destinationLatitude,$destinationLongitude',
+      //       'mode': 'd',
+      //     });
+      const url =
+          'https://www.google.com/maps/dir/?api=1&destination=$destinationLatitude,$destinationLongitude&travelmode=driving';
+      final uri = Uri.parse(url);
       if (await canLaunchUrl(
         uri,
       )) {
@@ -278,169 +282,307 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
               ),
             ];
           },
-          body: Container(
-            padding: const EdgeInsets.all(
-              16,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'VENKATESWARA PG GENTS HOSTEL',
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                          Text(
-                            'Double sharing',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(
-                        8,
-                      ),
-                      decoration: BoxDecoration(
-                        // color: const Color.fromARGB(
-                        //   100,
-                        //   255,
-                        //   0,
-                        //   0,
-                        // ), // Transparent red background
-                        color: const Color.fromARGB(
-                          100,
-                          0,
-                          0,
-                          0,
-                        ),
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ),
-                      ),
-                      child: const Text(
-                        'Boys PG',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const LinearLine(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Address & Direction',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    SizedBox(
-                      height: context.height * 0.01,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Row(
+          body: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(
+                16,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              LineIcons.mapMarker,
-                              size: 24,
+                            const Text(
+                              'VENKATESWARA PG GENTS HOSTEL',
+                              style: TextStyle(
+                                fontSize: 20,
+                              ),
                             ),
-                            SizedBox(
-                              width: context.width * 0.02,
-                            ),
-                            const Expanded(
-                              child: Text(
-                                'No87, Venkateswar PG Hostel, 16, 3rd Main Rd, Venkateswara Nagar, Velachery, Chennai, Tamil Nadu 600042',
+                            Text(
+                              'Double sharing',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade400,
                               ),
                             ),
                           ],
-                        )),
-                        IconButton(
-                          color: Colors.black,
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.blue.shade200,
-                          ),
-                          onPressed: goToDestination,
-                          icon: const Icon(
-                            LineIcons.directions,
-                          ),
                         ),
-                      ],
-                    )
-                  ],
-                ),
-                const LinearLine(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Room Facilities',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey.shade600,
                       ),
-                    ),
-                    SizedBox(
-                      height: context.height * 0.01,
-                    ),
-                    GridView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 0.0,
-                        childAspectRatio: 4.5,
+                      Container(
+                        padding: const EdgeInsets.all(
+                          8,
+                        ),
+                        decoration: BoxDecoration(
+                          // color: const Color.fromARGB(
+                          //   100,
+                          //   255,
+                          //   0,
+                          //   0,
+                          // ), // Transparent red background
+                          color: const Color.fromARGB(
+                            100,
+                            0,
+                            0,
+                            0,
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                        ),
+                        child: const Text(
+                          'Boys PG',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                      children: [
-                        _roomFacilities(
-                          icon: wifi,
-                          facility: 'Wifi',
+                    ],
+                  ),
+                  const LinearLine(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Address & Map Direction',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
                         ),
-                        _roomFacilities(
-                          icon: cctc,
-                          facility: 'CCTV',
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Row(
+                            children: [
+                              const Icon(
+                                LineIcons.mapMarker,
+                                size: 24,
+                              ),
+                              SizedBox(
+                                width: context.width * 0.02,
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  'No87, Venkateswar PG Hostel, 16, 3rd Main Rd, Venkateswara Nagar, Velachery, Chennai, Tamil Nadu 600042',
+                                ),
+                              ),
+                            ],
+                          )),
+                          IconButton(
+                            color: Colors.black,
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.blue.shade200,
+                            ),
+                            onPressed: goToDestination,
+                            icon: const Icon(
+                              LineIcons.directions,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  const LinearLine(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Room Facilities',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
                         ),
-                        _roomFacilities(
-                          icon: fingerPrint,
-                          facility: 'Biometric Lock',
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      GridView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 0.0,
+                          childAspectRatio: 4.5,
                         ),
-                        _roomFacilities(
-                          icon: fridge,
-                          facility: 'Refrigerator',
+                        children: [
+                          _roomFacilities(
+                            icon: wifi,
+                            facility: 'Wifi',
+                          ),
+                          _roomFacilities(
+                            icon: cctc,
+                            facility: 'CCTV',
+                          ),
+                          _roomFacilities(
+                            icon: fingerPrint,
+                            facility: 'Biometric Lock',
+                          ),
+                          _roomFacilities(
+                            icon: fridge,
+                            facility: 'Refrigerator',
+                          ),
+                          _roomFacilities(
+                            icon: water,
+                            facility: 'RO Filter',
+                          ),
+                          _roomFacilities(
+                            icon: washingMachine,
+                            facility: 'Washing Machine',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const LinearLine(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PG Facilities',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
                         ),
-                        _roomFacilities(
-                          icon: water,
-                          facility: 'RO Filter',
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      GridView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 8.0,
+                          crossAxisSpacing: 8.0,
+                          childAspectRatio: 3.2,
                         ),
-                        _roomFacilities(
-                          icon: washingMachine,
-                          facility: 'Washing Machine',
+                        children: [
+                          _pgFacilities(
+                            facility: 'Semi-Furnished rooms',
+                          ),
+                          _pgFacilities(
+                            facility: 'Electricity bill is included',
+                          ),
+                          _pgFacilities(
+                            facility: 'Cleaning service is included in rent',
+                          ),
+                          _pgFacilities(
+                            facility: '3-4 times Meal is included',
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const LinearLine(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PG Owner Details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const LinearLine(),
-                Column(children:[],),
-              ],
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(
+                                0.15,
+                              ),
+                              spreadRadius: 0,
+                              blurRadius: 2,
+                              offset: const Offset(
+                                0,
+                                4,
+                              ),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Image.asset(
+                                  pgOwner,
+                                  // width: context.width * 0.2,
+                                  height: context.height * 0.08,
+                                ),
+                                const Text(
+                                  'Bubu',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: makingPhoneCall,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 8,
+                                ),
+                                child: Image.asset(
+                                  call,
+                                  width: context.width * 0.1,
+                                  height: context.height * 0.1,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const LinearLine(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'General Instruction',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      const Text(
+                        '- We recommend that you consider finalizing the payment only after reaching a mutual agreement with the pg owner.',
+                      ),
+                      SizedBox(
+                        height: context.height * 0.01,
+                      ),
+                      const Text(
+                        '- Before paying to the pg owner, ensure clear communication and understanding among everyone involved.',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -543,6 +685,37 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
           facility,
         ),
       ],
+    );
+  }
+
+  Widget _pgFacilities({required String facility}) {
+    return Container(
+      padding: const EdgeInsets.all(
+        8,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(
+          8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.chevron_right,
+            size: 24,
+          ),
+          SizedBox(
+            width: context.width * 0.01,
+          ),
+          Expanded(
+            child: Text(
+              facility,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -9,3 +9,4 @@ const String initRoute = '/init';
 const String pgRoute = '/pg';
 const String searchRoute = '/search';
 const String pgDetailsRoute = '/pgDetails';
+const String bookingDetailsRoute = '/bookingDetails';

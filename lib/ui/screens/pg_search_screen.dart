@@ -381,7 +381,7 @@ class _FiltersState extends State<Filters> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: context.height * 0.48,
+      height: context.height * 0.5,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -416,73 +416,76 @@ class _FiltersState extends State<Filters> {
                   SizedBox(
                     height: context.height * 0.01,
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'PG Category',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black45,
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'PG Category',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: context.height * 0.01,
-                      ),
-                      Wrap(
-                        spacing: 10,
-                        children: _pgTypes.map((pgType) {
-                          return ChoiceChip(
-                            label: Text(pgType['label']),
-                            selected: _selectedPGCategory == pgType['label'],
-                            selectedColor: Colors.blue[100],
-                            onSelected: (bool selected) {
-                              setState(() {
-                                _selectedPGCategory =
-                                    selected ? pgType['label'] : '';
-                              });
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(
-                        height: context.height * 0.02,
-                      ),
-                      const Text(
-                        'Rooms Category',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black45,
+                        SizedBox(
+                          height: context.height * 0.01,
                         ),
-                      ),
-                      SizedBox(
-                        height: context.height * 0.01,
-                      ),
-                      Wrap(
-                        spacing: 10,
-                        children: _roomsCategories.map(
-                          (roomType) {
+                        Wrap(
+                          spacing: 10,
+                          children: _pgTypes.map((pgType) {
                             return ChoiceChip(
-                              label: Text(roomType['label']),
-                              avatar: _selectedRoomCategory == roomType['label']
-                                  ? null
-                                  : Text(
-                                      '${_roomsCategories.indexOf(roomType) + 1}',
-                                    ),
-                              selected:
-                                  _selectedRoomCategory == roomType['label'],
+                              label: Text(pgType['label']),
+                              selected: _selectedPGCategory == pgType['label'],
                               selectedColor: Colors.blue[100],
                               onSelected: (bool selected) {
                                 setState(() {
-                                  _selectedRoomCategory =
-                                      selected ? roomType['label'] : '';
+                                  _selectedPGCategory =
+                                      selected ? pgType['label'] : '';
                                 });
                               },
                             );
-                          },
-                        ).toList(),
-                      ),
-                    ],
+                          }).toList(),
+                        ),
+                        SizedBox(
+                          height: context.height * 0.02,
+                        ),
+                        const Text(
+                          'Rooms Category',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        SizedBox(
+                          height: context.height * 0.01,
+                        ),
+                        Wrap(
+                          spacing: 10,
+                          children: _roomsCategories.map(
+                            (roomType) {
+                              return ChoiceChip(
+                                label: Text(roomType['label']),
+                                avatar:
+                                    _selectedRoomCategory == roomType['label']
+                                        ? null
+                                        : Text(
+                                            '${_roomsCategories.indexOf(roomType) + 1}',
+                                          ),
+                                selected:
+                                    _selectedRoomCategory == roomType['label'],
+                                selectedColor: Colors.blue[100],
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    _selectedRoomCategory =
+                                        selected ? roomType['label'] : '';
+                                  });
+                                },
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

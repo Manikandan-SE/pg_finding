@@ -124,7 +124,7 @@ class PgCard extends StatelessWidget {
                 10,
               ),
               width: double.infinity,
-              height: context.height * 0.075,
+              height: context.height * 0.085,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(
                   20,
