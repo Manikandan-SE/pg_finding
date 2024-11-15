@@ -91,7 +91,11 @@ class Header extends StatelessWidget {
             ],
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                profileRoute,
+              );
+            },
             child: SizedBox(
               width: context.width * 0.2,
               child: Image.asset(

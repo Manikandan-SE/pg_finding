@@ -1,4 +1,4 @@
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -64,67 +64,67 @@ class _InitScreenState extends State<InitScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    height: context.height * 0.05,
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(
-                      left: 30,
-                      right: 30,
-                    ),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white,
-                      ),
-                      onPressed: () async {
-                        var credential = await AuthServices.signInWithGoogle();
-                        print('credential $credential');
-                        if (credential != null) {
-                          var userDetails = UserModel(
-                            name: credential.user?.displayName ?? '',
-                            email: credential.user?.email ?? '',
-                          );
-                          await SharedPreferencesUtils.setString(
-                            userDataKey,
-                            jsonEncode(
-                              userDetails,
-                            ),
-                          );
-                          Navigator.of(context).pushReplacementNamed(
-                            pgRoute,
-                          );
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              googleLogo,
-                              height: 24,
-                              width: 24,
-                            ),
-                            SizedBox(
-                              width: context.width * 0.03,
-                            ),
-                            const Text(
-                              signInWithGoogle,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: context.height * 0.02,
-                  ),
+                  // Container(
+                  //   height: context.height * 0.05,
+                  //   width: double.infinity,
+                  //   padding: const EdgeInsets.only(
+                  //     left: 30,
+                  //     right: 30,
+                  //   ),
+                  //   child: ElevatedButton(
+                  //     style: ElevatedButton.styleFrom(
+                  //       foregroundColor: Colors.black,
+                  //       backgroundColor: Colors.white,
+                  //     ),
+                  //     onPressed: () async {
+                  //       var credential = await AuthServices.signInWithGoogle();
+                  //       print('credential $credential');
+                  //       if (credential != null) {
+                  //         var userDetails = UserModel(
+                  //           name: credential.user?.displayName ?? '',
+                  //           email: credential.user?.email ?? '',
+                  //         );
+                  //         await SharedPreferencesUtils.setString(
+                  //           userDataKey,
+                  //           jsonEncode(
+                  //             userDetails,
+                  //           ),
+                  //         );
+                  //         Navigator.of(context).pushReplacementNamed(
+                  //           pgRoute,
+                  //         );
+                  //       }
+                  //     },
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                  //       child: Row(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Image.asset(
+                  //             googleLogo,
+                  //             height: 24,
+                  //             width: 24,
+                  //           ),
+                  //           SizedBox(
+                  //             width: context.width * 0.03,
+                  //           ),
+                  //           const Text(
+                  //             signInWithGoogle,
+                  //             style: TextStyle(
+                  //               fontSize: 18,
+                  //               color: Colors.black54,
+                  //               fontWeight: FontWeight.w600,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: context.height * 0.02,
+                  // ),
                   Container(
                     height: context.height * 0.09,
                     width: double.infinity,

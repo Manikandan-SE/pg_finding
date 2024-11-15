@@ -26,6 +26,10 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const BookingDetailsScreen(),
         );
+      case profileRoute:
+        return MaterialPageRoute(
+          builder: (_) => const ProfileScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

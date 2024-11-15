@@ -52,5 +52,5 @@ UserModel? getUserData() {
 
 Future<void> handleLogout() async {
   SharedPreferencesUtils.clearAllPref();
-  await AuthServices.signOutFromGoogle();
+  //await AuthServices.signOutFromGoogle();
 }

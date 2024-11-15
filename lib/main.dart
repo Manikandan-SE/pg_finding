@@ -48,11 +48,8 @@ class PgFindingApp extends StatelessWidget {
         ),
         // home: const SplashScreen(),
         onGenerateRoute: AppRouter.generateRoute,
-        initialRoute:
-            //  getUserData() != null ?
-            pgRoute
-        //  :
-        //  initRoute,
+        initialRoute: pgRoute
+        //getUserData() != null ? pgRoute : initRoute,
         );
   }
 }
