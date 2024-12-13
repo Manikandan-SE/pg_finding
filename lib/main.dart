@@ -40,17 +40,16 @@ class PgFindingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Pg Finding App',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: 'FiraSansExtraCondensed',
-          useMaterial3: true,
-        ),
-        // home: const SplashScreen(),
-        onGenerateRoute: AppRouter.generateRoute,
-        initialRoute: pgRoute
-        //getUserData() != null ? pgRoute : initRoute,
-        );
+      title: 'Pg Finding App',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'FiraSansExtraCondensed',
+        useMaterial3: true,
+      ),
+      // home: const SplashScreen(),
+      onGenerateRoute: AppRouter.generateRoute,
+      initialRoute: getUserData() != null ? pgRoute : initRoute,
+    );
   }
 }
 

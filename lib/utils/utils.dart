@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/index.dart';
 import 'index.dart';
@@ -50,7 +51,78 @@ UserModel? getUserData() {
   return null;
 }
 
+Future<void> setBaseUrl(String? baseUrl) async {
+  await SharedPreferencesUtils.setString(
+    baseUrlKey,
+    baseUrl ?? '',
+  );
+}
+
+String? getBaseUrl() {
+  String baseUrl = SharedPreferencesUtils.getString(
+    baseUrlKey,
+  );
+  if (baseUrl.isNotEmpty) {
+    return baseUrl;
+  }
+  return null;
+}
+
+Future<void> setUserId(String? userId) async {
+  await SharedPreferencesUtils.setString(
+    userIdKey,
+    userId ?? '',
+  );
+}
+
+String? getUserId() {
+  String userId = SharedPreferencesUtils.getString(
+    userIdKey,
+  );
+  if (userId.isNotEmpty) {
+    return userId;
+  }
+  return null;
+}
+
 Future<void> handleLogout() async {
-  SharedPreferencesUtils.clearAllPref();
+  await SharedPreferencesUtils.clearAllPref();
   //await AuthServices.signOutFromGoogle();
+}
+
+String getPgCategory({String? pgCategory}) {
+  switch (pgCategory) {
+    case 'Boy':
+      return 'Boys PG';
+    case 'Girl':
+      return 'Girls PG';
+    case 'Co-Living':
+      return 'Co-Living';
+    default:
+      return '';
+  }
+}
+
+String getPgType({String? pgType}) {
+  switch (pgType) {
+    case 'Double':
+      return 'Double sharing';
+    case 'Single':
+      return 'Single';
+    case 'Triple':
+      return 'Triple sharing';
+    default:
+      return '';
+  }
+}
+
+String formatAmount(String? amount) {
+  if (amount == null) return '0';
+  // Format the amount as INR with commas
+  final formatCurrency = NumberFormat.currency(
+    locale: 'en_IN', // For Indian locale
+    symbol: '₹', // INR symbol
+    decimalDigits: 0,
+  );
+  return formatCurrency.format(double.tryParse(amount) ?? 0);
 }

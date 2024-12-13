@@ -7,6 +7,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:location/location.dart';
 
+import '../../models/index.dart';
+import '../../utils/index.dart';
 import 'index.dart';
 
 class PGScreen extends StatefulWidget {
@@ -23,6 +25,14 @@ class _PGScreenState extends State<PGScreen> {
   String currentAddress = '';
   Location location = Location();
 
+  bool initOncePopularPg = true;
+
+  bool initOnceNearByPg = true;
+
+  List<FilterPgModel?>? pgList;
+
+  List<LocalityModel?>? localityList;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +40,7 @@ class _PGScreenState extends State<PGScreen> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async => await fetchLocationUpdates(),
     );
+    getLocality();
   }
 
   Future<void> _getCurrentPosition() async {
@@ -101,6 +112,7 @@ class _PGScreenState extends State<PGScreen> {
       currentAddress =
           '${place.subLocality != null && place.subLocality!.isNotEmpty ? '${place.subLocality},' : ''} ${place.locality != null && place.locality!.isNotEmpty ? '${place.locality},' : ''} ${place.postalCode != null && place.postalCode!.isNotEmpty ? '${place.postalCode},' : ''} Tamilnadu'
               .trim(); //${place.administrativeArea}
+      getFilterPG(place.subLocality);
       setState(() {});
     }).catchError((e) {
       if (e is PlatformException) {
@@ -109,6 +121,41 @@ class _PGScreenState extends State<PGScreen> {
         print("Unexpected error: $e");
       }
     });
+  }
+
+  void getFilterPG(String? subLocality) async {
+    if (subLocality != null && subLocality.isNotEmpty) {
+      if (initOnceNearByPg) {
+        setState(() {
+          initOnceNearByPg = false;
+        });
+        var tempBaseUrl = await AppServices().fetchBaseUrl();
+        var tempUserId = await AppServices().postUserMobileNumber(
+          phoneNumber: getUserData()?.phoneNumber ?? '',
+        );
+        var filteredPgList = await AppServices().fetchFilterPG(
+          tempUserId: tempUserId,
+          tempBaseUrl: tempBaseUrl,
+          city: subLocality.toLowerCase(),
+        ); //currentAddress.split(',')[0]
+        setState(() {
+          pgList = filteredPgList ?? [];
+        });
+      }
+    } else {
+      if (initOncePopularPg) {
+        setState(() {
+          initOncePopularPg = false;
+        });
+        var tempBaseUrl = await AppServices().fetchBaseUrl();
+        var filteredPgList = await AppServices().fetchPopularPG(
+          tempBaseUrl: tempBaseUrl,
+        );
+        setState(() {
+          pgList = filteredPgList ?? [];
+        });
+      }
+    }
   }
 
   Future<void> fetchLocationUpdates() async {
@@ -124,6 +171,31 @@ class _PGScreenState extends State<PGScreen> {
           );
         });
       }
+    });
+  }
+
+  void getLocality() async {
+    var tempBaseUrl = await AppServices().fetchBaseUrl();
+    var filteredLocalityList = await AppServices().fetchLocality(
+      tempBaseUrl: tempBaseUrl,
+    );
+    setState(() {
+      localityList = filteredLocalityList ?? [];
+    });
+  }
+
+  void onTapSavePG({FilterPgModel? pgDetails}) {
+    if (pgDetails == null) return;
+    var tempPgList = List<FilterPgModel>.from(pgList != null ? pgList! : []);
+    setState(() {
+      pgList = tempPgList.map((pg) {
+        if (pg.pgId == pgDetails.pgId) {
+          return pg.copyWith(
+            isSaved: pg.isSaved != null ? !pg.isSaved! : false,
+          );
+        }
+        return pg;
+      }).toList();
     });
   }
 
@@ -192,10 +264,11 @@ class _PGScreenState extends State<PGScreen> {
         children: [
           HomeScreen(
             currentAddress: currentAddress,
+            localityList: localityList,
+            pgList: pgList,
+            onTapSave: onTapSavePG,
           ),
-          MapScreen(
-            locationData: locationData,
-          ),
+          MapScreen(locationData: locationData, pgList: pgList),
           const SavedPgScreen(),
           const BookingsScreen(),
         ],
@@ -262,14 +335,3 @@ class _PGScreenState extends State<PGScreen> {
     );
   }
 }
-
-  //  ElevatedButton(
-  //             onPressed: () {
-  //               handleLogout();
-  //               Navigator.of(context).pushNamedAndRemoveUntil(
-  //                 initRoute,
-  //                 (route) => false,
-  //               );
-  //             },
-  //             child: const Text('Logout'),
-  //           )

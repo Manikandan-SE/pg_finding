@@ -6,11 +6,21 @@ import 'package:line_icons/line_icons.dart';
 import 'package:pg_finding/utils/index.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../models/index.dart';
 import '../../widgets/index.dart';
 
 class HomeScreen extends StatelessWidget {
   final String currentAddress;
-  const HomeScreen({super.key, required this.currentAddress});
+  final List<LocalityModel?>? localityList;
+  final List<FilterPgModel?>? pgList;
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  const HomeScreen({
+    super.key,
+    required this.currentAddress,
+    this.localityList,
+    this.pgList,
+    this.onTapSave,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +50,13 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const NearByPGs(),
-                    const BrowseByLocality(),
+                    NearByPGs(
+                      pgList: pgList,
+                      onTapSave: onTapSave,
+                    ),
+                    BrowseByLocality(
+                      localityList: localityList,
+                    ),
                     SizedBox(
                       height: context.height * 0.025,
                     ),
@@ -80,9 +95,9 @@ class Header extends StatelessWidget {
                   fontSize: 16, //22
                 ),
               ),
-              const Text(
-                'Manikandan',
-                style: TextStyle(
+              Text(
+                getUserData()?.name ?? 'Pookie',
+                style: const TextStyle(
                   color: Colors.black,
                   letterSpacing: 1.5,
                   fontSize: 23, //30
@@ -351,7 +366,13 @@ class _SearchFieldState extends State<SearchField> {
 }
 
 class NearByPGs extends StatelessWidget {
-  const NearByPGs({super.key});
+  final List<FilterPgModel?>? pgList;
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  const NearByPGs({
+    super.key,
+    this.pgList,
+    this.onTapSave,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -390,34 +411,31 @@ class NearByPGs extends StatelessWidget {
         ),
         SizedBox(
           height: context.height * 0.25,
-          child: ListView(
+          child: ListView.separated(
+            separatorBuilder: (context, index) => SizedBox(
+              width: context.width * 0.04,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
             ),
             scrollDirection: Axis.horizontal,
-            children: [
-              PgCard(
+            itemCount: pgList?.length ?? 0,
+            itemBuilder: (context, index) {
+              return PgCard(
+                pgDetails: pgList != null ? pgList![index] : null,
                 width: context.width * 0.8,
                 height: context.height,
+                onTapSave: onTapSave,
+                isSaved: pgList != null && pgList![index] != null
+                    ? pgList![index]!.isSaved
+                    : false,
                 onTap: () {
                   Navigator.of(context).pushNamed(
                     pgDetailsRoute,
                   );
                 },
-              ),
-              SizedBox(
-                width: context.width * 0.04,
-              ),
-              PgCard(
-                width: context.width * 0.8,
-                height: context.height,
-                onTap: () {
-                  Navigator.of(context).pushNamed(
-                    pgDetailsRoute,
-                  );
-                },
-              ),
-            ],
+              );
+            },
           ),
         ),
       ],
@@ -426,7 +444,11 @@ class NearByPGs extends StatelessWidget {
 }
 
 class BrowseByLocality extends StatelessWidget {
-  const BrowseByLocality({super.key});
+  final List<LocalityModel?>? localityList;
+  const BrowseByLocality({
+    super.key,
+    this.localityList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -447,18 +469,18 @@ class BrowseByLocality extends StatelessWidget {
         ),
         SizedBox(
           height: context.height * 0.26,
-          child: ListView(
+          child: ListView.separated(
+            separatorBuilder: (context, index) => SizedBox(
+              width: context.width * 0.04,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
             ),
             scrollDirection: Axis.horizontal,
-            children: [
-              const LocalityCard(),
-              SizedBox(
-                width: context.width * 0.04,
-              ),
-              const LocalityCard(),
-            ],
+            itemCount: localityList?.length ?? 0,
+            itemBuilder: (context, index) => LocalityCard(
+              locality: localityList != null ? localityList![index] : null,
+            ),
           ),
         ),
       ],
@@ -467,7 +489,11 @@ class BrowseByLocality extends StatelessWidget {
 }
 
 class LocalityCard extends StatelessWidget {
-  const LocalityCard({super.key});
+  final LocalityModel? locality;
+  const LocalityCard({
+    super.key,
+    this.locality,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -506,8 +532,7 @@ class LocalityCard extends StatelessWidget {
                 width: double.infinity,
                 height: context.height * 0.2,
                 fit: BoxFit.cover,
-                imageUrl:
-                    "https://lh3.googleusercontent.com/p/AF1QipNqVC0y-ddz88RrR7UhllUgpwfVMMK72-D_-6KO=s1360-w1360-h1020",
+                imageUrl: locality?.img ?? '',
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     Shimmer.fromColors(
                   baseColor: Colors.grey.shade300,
@@ -540,9 +565,9 @@ class LocalityCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Velachery'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(locality?.locality ?? ''),
             ),
           ],
         ),

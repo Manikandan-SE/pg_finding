@@ -24,10 +24,15 @@ class _InitScreenState extends State<InitScreen>
   @override
   void initState() {
     super.initState();
+    initBaseUrl();
     _controller = VideoPlayerController.asset(animatedLogo);
     _controller?.initialize();
     _controller?.play();
     //SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+  }
+
+  void initBaseUrl() async {
+    await AppServices().fetchBaseUrl();
   }
 
   @override
@@ -153,8 +158,10 @@ class _InitScreenState extends State<InitScreen>
                                     ? '${userData.firstName} ${(userData.lastName != null && userData.lastName!.isNotEmpty) ? userData.lastName : ''}'
                                         .trim()
                                     : 'Buddy',
-                                phoneNumber: userData.phoneNumber,
+                                phoneNumber: userData.phoneNumber ?? '',
                               );
+                              await AppServices().postUserMobileNumber(
+                                  phoneNumber: userData.phoneNumber ?? '');
                               await setUserData(userDetails);
                               Navigator.of(context).pushReplacementNamed(
                                 pgRoute,

@@ -3,29 +3,54 @@ import 'package:flutter/material.dart';
 import 'package:pg_finding/utils/index.dart';
 import 'package:shimmer/shimmer.dart';
 
-class PgCard extends StatelessWidget {
+import '../../models/index.dart';
+
+class PgCard extends StatefulWidget {
+  final FilterPgModel? pgDetails;
   final double? width;
   final double? height;
   final Function()? onTap;
-  const PgCard({super.key, this.width, this.height, this.onTap});
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  final bool? isSaved;
+  const PgCard({
+    super.key,
+    this.width,
+    this.height,
+    this.onTap,
+    this.pgDetails,
+    this.isSaved,
+    this.onTapSave,
+  });
+
+  @override
+  State<PgCard> createState() => _PgCardState();
+}
+
+class _PgCardState extends State<PgCard> {
+  void onTapSave() {
+    if (widget.onTapSave != null) {
+      widget.onTapSave!(
+        pgDetails: widget.pgDetails,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Stack(
         children: [
           SizedBox(
-            width: width ?? double.infinity,
-            height: height,
+            width: widget.width ?? double.infinity,
+            height: widget.height,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(
                 10,
               ),
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                imageUrl:
-                    "https://lh3.googleusercontent.com/p/AF1QipNqVC0y-ddz88RrR7UhllUgpwfVMMK72-D_-6KO=s1360-w1360-h1020",
+                imageUrl: widget.pgDetails?.img1 ?? '',
                 progressIndicatorBuilder: (context, url, downloadProgress) =>
                     Shimmer.fromColors(
                   baseColor: Colors.grey.shade300,
@@ -67,25 +92,35 @@ class PgCard extends StatelessWidget {
                 8,
               ),
               decoration: BoxDecoration(
-                // color: const Color.fromARGB(
-                //   100,
-                //   255,
-                //   0,
-                //   0,
-                // ), // Transparent red background
-                color: const Color.fromARGB(
-                  100,
-                  0,
-                  0,
-                  0,
-                ),
+                color: getPgCategory(
+                              pgCategory: widget.pgDetails?.pgCategory,
+                            ) ==
+                            'Boys PG' ||
+                        getPgCategory(
+                              pgCategory: widget.pgDetails?.pgCategory,
+                            ) ==
+                            'Co-Living'
+                    ? const Color.fromARGB(
+                        100,
+                        0,
+                        0,
+                        0,
+                      )
+                    : const Color.fromARGB(
+                        100,
+                        255,
+                        0,
+                        0,
+                      ),
                 borderRadius: BorderRadius.circular(
                   8,
                 ),
               ),
-              child: const Text(
-                'Boys PG',
-                style: TextStyle(
+              child: Text(
+                getPgCategory(
+                  pgCategory: widget.pgDetails?.pgCategory,
+                ),
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                 ),
@@ -108,9 +143,11 @@ class PgCard extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 color: Colors.red,
                 iconSize: 30,
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.favorite_border_outlined,
+                onPressed: onTapSave,
+                icon: Icon(
+                  widget.isSaved != null && !widget.isSaved!
+                      ? Icons.favorite_border_outlined
+                      : Icons.favorite,
                 ),
               ),
             ),
@@ -133,18 +170,18 @@ class PgCard extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Vimala PG',
-                        style: TextStyle(
+                        widget.pgDetails?.pg_name ?? '',
+                        style: const TextStyle(
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        '₹7,000',
-                        style: TextStyle(
+                        formatAmount(widget.pgDetails?.amount),
+                        style: const TextStyle(
                           fontSize: 18,
                         ),
                       ),
@@ -154,14 +191,14 @@ class PgCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Velachery,Chennai',
+                        '${widget.pgDetails?.city ?? ''},Chennai'.trim(),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade700,
                         ),
                       ),
                       Text(
-                        'double sharing',
+                        getPgType(pgType: widget.pgDetails?.pgType),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade700,

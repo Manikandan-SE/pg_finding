@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
+import '../../../models/index.dart';
 import '../../../utils/index.dart';
 
 class MapScreen extends StatefulWidget {
   final LocationData? locationData;
-  const MapScreen({super.key, this.locationData});
+  final List<FilterPgModel?>? pgList;
+  const MapScreen({super.key, this.locationData, this.pgList});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -39,27 +41,62 @@ class _MapScreenState extends State<MapScreen> {
 
   void displayInfo(
       {required BitmapDescriptor userIcon, required BitmapDescriptor pgIcon}) {
+    var getLatLngInPgList = widget.pgList != null && widget.pgList!.isNotEmpty
+        ? widget.pgList!
+            .map((elem) => ({
+                  'pgId': elem?.pgId ?? 0,
+                  'icon': elem?.img1 ?? '',
+                  'latlng': LatLng(
+                    elem?.latitude ?? 0.0,
+                    elem?.longitude ?? 0.0,
+                  )
+                }))
+            .toList()
+        : [
+            {
+              'pgId': 1,
+              'icon': pgIcon,
+              'latlng': const LatLng(12.992733526761468, 80.21139742511788),
+            },
+            {
+              'pgId': 2,
+              'icon': pgIcon,
+              'latlng': const LatLng(13.036682665346392, 80.21054139707249),
+            },
+            {
+              'pgId': 3,
+              'icon': pgIcon,
+              'latlng': const LatLng(12.989035016170355, 80.21580923611359),
+            },
+          ];
+
     final List<Map<String, dynamic>> latlngPoint = [
       {
+        'pgId': -1,
         'icon': userIcon,
         'latlng': myCurrentPosition,
       },
-      {
-        'icon': pgIcon,
-        'latlng': const LatLng(12.992733526761468, 80.21139742511788),
-      },
-      {
-        'icon': pgIcon,
-        'latlng': const LatLng(13.036682665346392, 80.21054139707249),
-      },
-      {
-        'icon': pgIcon,
-        'latlng': const LatLng(12.989035016170355, 80.21580923611359),
-      },
+      ...getLatLngInPgList,
+      // {
+      //   'icon': pgIcon,
+      //   'latlng': const LatLng(12.992733526761468, 80.21139742511788),
+      // },
+      // {
+      //   'icon': pgIcon,
+      //   'latlng': const LatLng(13.036682665346392, 80.21054139707249),
+      // },
+      // {
+      //   'icon': pgIcon,
+      //   'latlng': const LatLng(12.989035016170355, 80.21580923611359),
+      // },
     ];
     for (var i = 0; i < latlngPoint.length; i++) {
       final markerIcon = latlngPoint[i]['icon'] as BitmapDescriptor;
       final position = latlngPoint[i]['latlng'] as LatLng;
+      final pgItem = widget.pgList != null && widget.pgList!.isNotEmpty
+          ? widget.pgList!
+              .firstWhere((elem) => (elem?.pgId ?? 0) == latlngPoint[i]['pgId'])
+          : null;
       markers.add(
         Marker(
           markerId: MarkerId(
@@ -70,7 +107,9 @@ class _MapScreenState extends State<MapScreen> {
           onTap: () async {
             if (customInfoWindowController.addInfoWindow != null) {
               customInfoWindowController.addInfoWindow!(
-                const PgWindowView(),
+                PgWindowView(
+                  pgItem: pgItem,
+                ),
                 position,
               );
               // final coordinates = await fetchPolylinePoints(
@@ -254,7 +293,8 @@ class _MapScreenState extends State<MapScreen> {
 }
 
 class PgWindowView extends StatelessWidget {
-  const PgWindowView({super.key});
+  final FilterPgModel? pgItem;
+  const PgWindowView({super.key, this.pgItem});
 
   @override
   Widget build(BuildContext context) {
