@@ -33,6 +33,10 @@ class _PGScreenState extends State<PGScreen> {
 
   List<LocalityModel?>? localityList;
 
+  List<FilterPgModel?>? savedPgList;
+
+  List<BookingListModel?>? bookingPgList;
+
   @override
   void initState() {
     super.initState();
@@ -134,28 +138,38 @@ class _PGScreenState extends State<PGScreen> {
           phoneNumber: getUserData()?.phoneNumber ?? '',
         );
         var filteredPgList = await AppServices().fetchFilterPG(
-          tempUserId: tempUserId,
-          tempBaseUrl: tempBaseUrl,
-          city: subLocality.toLowerCase(),
-        ); //currentAddress.split(',')[0]
-        setState(() {
-          pgList = filteredPgList ?? [];
-        });
+              tempUserId: tempUserId,
+              tempBaseUrl: tempBaseUrl,
+              city: subLocality.toLowerCase(),
+            ) ??
+            []; //currentAddress.split(',')[0]
+
+        if (filteredPgList.isNotEmpty) {
+          setState(() {
+            pgList = filteredPgList;
+          });
+        } else {
+          getPopularPG();
+        }
       }
     } else {
       if (initOncePopularPg) {
         setState(() {
           initOncePopularPg = false;
         });
-        var tempBaseUrl = await AppServices().fetchBaseUrl();
-        var filteredPgList = await AppServices().fetchPopularPG(
-          tempBaseUrl: tempBaseUrl,
-        );
-        setState(() {
-          pgList = filteredPgList ?? [];
-        });
+        getPopularPG();
       }
     }
+  }
+
+  void getPopularPG() async {
+    var tempBaseUrl = await AppServices().fetchBaseUrl();
+    var filteredPgList = await AppServices().fetchPopularPG(
+      tempBaseUrl: tempBaseUrl,
+    );
+    setState(() {
+      pgList = filteredPgList ?? [];
+    });
   }
 
   Future<void> fetchLocationUpdates() async {
@@ -190,12 +204,61 @@ class _PGScreenState extends State<PGScreen> {
     setState(() {
       pgList = tempPgList.map((pg) {
         if (pg.pgId == pgDetails.pgId) {
+          postSave(
+            pgDetails: pgDetails,
+          );
           return pg.copyWith(
-            isSaved: pg.isSaved != null ? !pg.isSaved! : false,
+            isSaved: pgDetails.isSaved != null ? !pgDetails.isSaved! : false,
           );
         }
         return pg;
       }).toList();
+    });
+  }
+
+  void onTapSavePGInSavedList({FilterPgModel? pgDetails}) {
+    if (pgDetails == null) return;
+    var tempPgList =
+        List<FilterPgModel>.from(savedPgList != null ? savedPgList! : []);
+
+    if (pgDetails.isSaved == null ||
+        (pgDetails.isSaved != null && pgDetails.isSaved!)) {
+      setState(() {
+        savedPgList = tempPgList
+            .where(
+              (pg) => pg.pgId != pgDetails.pgId,
+            )
+            .toList();
+      });
+    }
+    postSave(
+      pgDetails: pgDetails,
+    );
+    onTapSavePG(
+      pgDetails: pgDetails,
+    );
+  }
+
+  void postSave({FilterPgModel? pgDetails}) async {
+    await AppServices().postSave(
+      pgId: pgDetails?.pgId,
+      isSaved: pgDetails != null && pgDetails.isSaved != null
+          ? !pgDetails.isSaved!
+          : false,
+    );
+  }
+
+  void getSavedPGList() async {
+    final tempSavedPgList = await AppServices().fetchSavedList();
+    setState(() {
+      savedPgList = tempSavedPgList;
+    });
+  }
+
+  void getbookingPGList() async {
+    final tempBookingPgList = await AppServices().fetchBookingList();
+    setState(() {
+      bookingPgList = tempBookingPgList;
     });
   }
 
@@ -268,9 +331,18 @@ class _PGScreenState extends State<PGScreen> {
             pgList: pgList,
             onTapSave: onTapSavePG,
           ),
-          MapScreen(locationData: locationData, pgList: pgList),
-          const SavedPgScreen(),
-          const BookingsScreen(),
+          MapScreen(
+            locationData: locationData,
+            pgList: pgList,
+            onTapSave: onTapSavePG,
+          ),
+          SavedPgScreen(
+            savedPgList: savedPgList,
+            onTapSavePGInSavedList: onTapSavePGInSavedList,
+          ),
+          BookingsScreen(
+            bookingPgList: bookingPgList,
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -327,6 +399,12 @@ class _PGScreenState extends State<PGScreen> {
                 setState(() {
                   _selectedIndex = index;
                 });
+                if (index == 2) {
+                  getSavedPGList();
+                }
+                if (index == 3) {
+                  getbookingPGList();
+                }
               },
             ),
           ),

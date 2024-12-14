@@ -9,10 +9,15 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import '../../models/index.dart';
 import '../../utils/index.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
-  const BookingDetailsScreen({super.key});
+  final BookingListModel? bookingPg;
+  const BookingDetailsScreen({
+    super.key,
+    this.bookingPg,
+  });
 
   @override
   State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
@@ -29,68 +34,77 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
           'Booking Details',
         ),
         actions: [
-          PopupMenuButton<String>(
-            position: PopupMenuPosition.under,
-            icon: const Icon(
-              Icons.more_vert,
-            ),
-            onSelected: (value) {
-              if (value == 'cancel') {
-                // Handle the cancel booking action
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text("Cancel Booking"),
-                      content: const Text(
-                          "Are you sure you want to cancel the booking?"),
-                      actions: [
-                        TextButton(
-                          child: const Text(
-                            "No",
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text(
-                            "Yes",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.red,
-                            ),
-                          ),
-                          onPressed: () {
-                            // Add your cancellation logic here
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Booking cancelled",
+          widget.bookingPg != null &&
+                  widget.bookingPg!.booked != null &&
+                  widget.bookingPg!.booked == 'Cancelled'
+              ? const SizedBox()
+              : PopupMenuButton<String>(
+                  position: PopupMenuPosition.under,
+                  icon: const Icon(
+                    Icons.more_vert,
+                  ),
+                  onSelected: (value) {
+                    if (value == 'cancel') {
+                      // Handle the cancel booking action
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Cancel Booking"),
+                            content: const Text(
+                                "Are you sure you want to cancel the booking?"),
+                            actions: [
+                              TextButton(
+                                child: const Text(
+                                  "No",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
                                 ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
+                              TextButton(
+                                child: const Text(
+                                  "Yes",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  await AppServices().patchCancelBookedpg(
+                                    pgId:
+                                        widget.bookingPg?.pgDetails?.pgId ?? 0,
+                                    status: 'Cancelled',
+                                  );
+                                  // Add your cancellation logic here
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Booking cancelled",
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
-                );
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem(
-                  value: 'cancel',
-                  child: Text('Cancel Booking'),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      const PopupMenuItem(
+                        value: 'cancel',
+                        child: Text('Cancel Booking'),
+                      ),
+                    ];
+                  },
                 ),
-              ];
-            },
-          ),
         ],
       ),
       body: SizedBox(
@@ -108,64 +122,71 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
+              Column(
+                children: [Text(widget.bookingPg?.pgDetails?.pgName ?? '')],
+              )
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(
-          16,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(
-                0.15,
+      bottomNavigationBar: widget.bookingPg != null &&
+              widget.bookingPg!.booked != null &&
+              widget.bookingPg!.booked == 'Cancelled'
+          ? const SizedBox()
+          : Container(
+              padding: const EdgeInsets.all(
+                16,
               ),
-              spreadRadius: 0,
-              blurRadius: 15, // Increased blur radius
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        width: double.infinity,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(
-              12,
-            ),
-            backgroundColor: Colors.black,
-            overlayColor: Colors.black,
-            surfaceTintColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                12,
-              ),
-            ),
-            side: const BorderSide(
-              color: Colors.black,
-            ),
-          ),
-          onPressed: !isInvoiceLoading ? createPDF : () {},
-          child: !isInvoiceLoading
-              ? const Text(
-                  'Download Invoice',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(
+                      0.15,
+                    ),
+                    spreadRadius: 0,
+                    blurRadius: 15, // Increased blur radius
+                    offset: const Offset(0, 4),
                   ),
-                )
-              : const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
+                ],
+              ),
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(
+                    12,
+                  ),
+                  backgroundColor: Colors.black,
+                  overlayColor: Colors.black,
+                  surfaceTintColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      12,
+                    ),
+                  ),
+                  side: const BorderSide(
+                    color: Colors.black,
                   ),
                 ),
-        ),
-      ),
+                onPressed: !isInvoiceLoading ? createPDF : () {},
+                child: !isInvoiceLoading
+                    ? const Text(
+                        'Download Invoice',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      )
+                    : const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
     );
   }
 
@@ -176,6 +197,8 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     var applogo = (await rootBundle.load(appLogo)).buffer.asUint8List();
     final doc = pw.Document();
     final fontFamily = await PdfGoogleFonts.firaSansExtraCondensedRegular();
+    final bookingPg = widget.bookingPg;
+    final pgDetails = bookingPg?.pgDetails;
     doc.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -244,7 +267,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                             width: 5,
                           ),
                           pw.Text(
-                            'Bubu',
+                            getUserData()?.name ?? 'Buddy',
                           ),
                         ],
                       ),
@@ -260,7 +283,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                             width: 5,
                           ),
                           pw.Text(
-                            '14/10/2024',
+                            bookingPg?.bookingDate ?? '11/12/2024',
                           ),
                         ],
                       ),
@@ -287,12 +310,14 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                             height: 5,
                           ),
                           pw.Text(
-                            'Bubu PG',
+                            pgDetails?.pgName ?? '',
                           ),
-                          pw.Text(
-                            '8/5, Ragupathy Nagar, Nanganallur, Chennai - 600061',
-                            style: const pw.TextStyle(
-                              fontSize: 8,
+                          pw.Expanded(
+                            child: pw.Text(
+                              pgDetails?.pgAddress ?? '',
+                              style: const pw.TextStyle(
+                                fontSize: 8,
+                              ),
                             ),
                           ),
                         ],
@@ -311,7 +336,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           height: 5,
                         ),
                         pw.Text(
-                          '12231',
+                          '${bookingPg?.bookingId ?? ''}',
                         ),
                       ],
                     ),
@@ -351,7 +376,9 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           height: 5,
                         ),
                         pw.Text(
-                          'Boys PG',
+                          getPgCategory(
+                            pgCategory: pgDetails?.pgCategory,
+                          ),
                         ),
                       ],
                     ),
@@ -371,7 +398,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           height: 5,
                         ),
                         pw.Text(
-                          'Double Shaeing',
+                          getPgType(pgType: pgDetails?.pgType),
                         ),
                       ],
                     ),
@@ -434,7 +461,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                         ),
                       ),
                       pw.Text(
-                        '₹7,000',
+                        formatAmount(pgDetails?.amount),
                       ),
                     ],
                   ),

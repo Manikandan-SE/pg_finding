@@ -7,8 +7,16 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../models/index.dart';
+
 class PgDetailsScreen extends StatefulWidget {
-  const PgDetailsScreen({super.key});
+  final FilterPgModel? pgDetails;
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  const PgDetailsScreen({
+    super.key,
+    this.pgDetails,
+    this.onTapSave,
+  });
 
   @override
   State<PgDetailsScreen> createState() => _PgDetailsScreenState();
@@ -18,6 +26,8 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
   Razorpay? _razorpay;
   bool isPaymentLoading = false;
   bool isBooked = false;
+
+  bool isSaved = false;
 
   @override
   void initState() {
@@ -37,29 +47,47 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
         _handleExternalWallet,
       );
     }
+    setState(() {
+      isSaved = widget.pgDetails?.isSaved ?? false;
+    });
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     setState(() {
       isPaymentLoading = false;
       isBooked = true;
     });
+    await AppServices().postBookPg(
+      amount: widget.pgDetails?.amount ?? '0',
+      booked: 'Booked',
+      pgId: widget.pgDetails?.pgId ?? 0,
+    );
     print('payment success ${response.paymentId}');
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
+  void _handlePaymentError(PaymentFailureResponse response) async {
     setState(() {
       isPaymentLoading = false;
       isBooked = false;
     });
+    await AppServices().postBookPg(
+      amount: widget.pgDetails?.amount ?? '0',
+      booked: 'Cancelled',
+      pgId: widget.pgDetails?.pgId ?? 0,
+    );
     print('payment failed ${response.message}');
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
+  void _handleExternalWallet(ExternalWalletResponse response) async {
     setState(() {
       isPaymentLoading = false;
       isBooked = false;
     });
+    await AppServices().postBookPg(
+      amount: widget.pgDetails?.amount ?? '0',
+      booked: 'Booked',
+      pgId: widget.pgDetails?.pgId ?? 0,
+    );
     debugPrint('payment debited from ${response.walletName}');
   }
 
@@ -69,9 +97,11 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
     });
     var options = {
       'key': 'rzp_test_7Qh0tVrzu14RdS',
-      'amount': 100,
+      'amount': widget.pgDetails != null && widget.pgDetails?.amount != null
+          ? (int.parse(widget.pgDetails!.amount!) * 100)
+          : 0,
       'name': 'PG Finding App',
-      'description': 'Vimala PG',
+      'description': widget.pgDetails?.pg_name ?? '',
       'prefill': {
         'contact': getUserData()?.phoneNumber ?? '',
       }
@@ -87,8 +117,10 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
 
   void goToDestination() async {
     try {
-      const double destinationLatitude = 12.97142854321849;
-      const double destinationLongitude = 80.18270049618685;
+      double destinationLatitude =
+          widget.pgDetails?.latitude ?? 12.97142854321849;
+      double destinationLongitude =
+          widget.pgDetails?.longitude ?? 80.18270049618685;
       // final uri = Uri(
       //     scheme: "google.navigation",
       //     // host: '"0,0"',  {here we can put host}
@@ -96,7 +128,7 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
       //       'q': '$destinationLatitude,$destinationLongitude',
       //       'mode': 'd',
       //     });
-      const url =
+      final url =
           'https://www.google.com/maps/dir/?api=1&destination=$destinationLatitude,$destinationLongitude&travelmode=driving';
       final uri = Uri.parse(url);
       if (await canLaunchUrl(
@@ -113,7 +145,8 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
 
   void makingPhoneCall() async {
     try {
-      var url = Uri.parse("tel:7904696681");
+      final phone = widget.pgDetails?.owner?.ownerPhoneNumber ?? 7904696681;
+      var url = Uri.parse("tel:$phone");
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
       } else {
@@ -121,6 +154,17 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
       }
     } catch (e) {
       debugPrint(e.toString());
+    }
+  }
+
+  void onTapSave() {
+    setState(() {
+      isSaved = !isSaved;
+    });
+    if (widget.onTapSave != null) {
+      widget.onTapSave!(
+        pgDetails: widget.pgDetails,
+      );
     }
   }
 
@@ -180,9 +224,11 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                       padding: EdgeInsets.zero,
                       color: Colors.red,
                       iconSize: 30,
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.favorite_border_outlined,
+                      onPressed: onTapSave,
+                      icon: Icon(
+                        isSaved
+                            ? Icons.favorite
+                            : Icons.favorite_border_outlined,
                       ),
                     ),
                   ),
@@ -216,9 +262,9 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                     scrollDirection: Axis.horizontal,
                   ),
                   items: [
-                    "https://lh3.googleusercontent.com/p/AF1QipNqVC0y-ddz88RrR7UhllUgpwfVMMK72-D_-6KO=s1360-w1360-h1020",
-                    "https://lh3.googleusercontent.com/p/AF1QipO2KMuegtNPjdumFDCQbKI89Q5nQZ_AbS0ddrcU=s1360-w1360-h1020",
-                    "https://lh5.googleusercontent.com/p/AF1QipO3aGmyIAxhRfDA18obiewFfzniFmVhJ1zttvLB=w141-h176-n-k-no-nu",
+                    widget.pgDetails?.img1 ?? '',
+                    widget.pgDetails?.img2 ?? '',
+                    widget.pgDetails?.img3 ?? '',
                   ].map((item) {
                     return Builder(
                       builder: (BuildContext context) {
@@ -297,14 +343,14 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'VENKATESWARA PG GENTS HOSTEL',
-                              style: TextStyle(
+                            Text(
+                              widget.pgDetails?.pg_name ?? '',
+                              style: const TextStyle(
                                 fontSize: 20,
                               ),
                             ),
                             Text(
-                              'Double sharing',
+                              getPgType(pgType: widget.pgDetails?.pgType),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey.shade400,
@@ -318,25 +364,37 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                           8,
                         ),
                         decoration: BoxDecoration(
-                          // color: const Color.fromARGB(
-                          //   100,
-                          //   255,
-                          //   0,
-                          //   0,
-                          // ), // Transparent red background
-                          color: const Color.fromARGB(
-                            100,
-                            0,
-                            0,
-                            0,
-                          ),
+                          color: getPgCategory(
+                                        pgCategory:
+                                            widget.pgDetails?.pgCategory,
+                                      ) ==
+                                      'Boys PG' ||
+                                  getPgCategory(
+                                        pgCategory:
+                                            widget.pgDetails?.pgCategory,
+                                      ) ==
+                                      'Co-Living'
+                              ? const Color.fromARGB(
+                                  100,
+                                  0,
+                                  0,
+                                  0,
+                                )
+                              : const Color.fromARGB(
+                                  100,
+                                  255,
+                                  0,
+                                  0,
+                                ), // Transparent red background
                           borderRadius: BorderRadius.circular(
                             8,
                           ),
                         ),
-                        child: const Text(
-                          'Boys PG',
-                          style: TextStyle(
+                        child: Text(
+                          getPgCategory(
+                            pgCategory: widget.pgDetails?.pgCategory,
+                          ),
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
                           ),
@@ -370,9 +428,9 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                               SizedBox(
                                 width: context.width * 0.02,
                               ),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
-                                  'No87, Venkateswar PG Hostel, 16, 3rd Main Rd, Venkateswara Nagar, Velachery, Chennai, Tamil Nadu 600042',
+                                  widget.pgDetails?.pgAddress ?? '',
                                 ),
                               ),
                             ],
@@ -529,9 +587,9 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                                   // width: context.width * 0.2,
                                   height: context.height * 0.08,
                                 ),
-                                const Text(
-                                  'Bubu',
-                                  style: TextStyle(
+                                Text(
+                                  widget.pgDetails?.owner?.ownerName ?? '',
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     color: Colors.black54,
                                   ),
@@ -617,9 +675,9 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
                       fontSize: 18,
                     ),
                   ),
-                  const Text(
-                    '₹7,000',
-                    style: TextStyle(
+                  Text(
+                    formatAmount(widget.pgDetails?.amount),
+                    style: const TextStyle(
                       fontSize: 20,
                     ),
                   ),

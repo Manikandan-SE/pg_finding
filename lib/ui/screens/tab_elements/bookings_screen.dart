@@ -3,8 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:pg_finding/utils/index.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../models/index.dart';
+
 class BookingsScreen extends StatelessWidget {
-  const BookingsScreen({super.key});
+  final List<BookingListModel?>? bookingPgList;
+  const BookingsScreen({
+    super.key,
+    this.bookingPgList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +32,20 @@ class BookingsScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(
+                  height: context.width * 0.05,
+                ),
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
                 ),
-                children: [
-                  const BookingsCard(),
-                  SizedBox(
-                    height: context.width * 0.05,
-                  ),
-                  const BookingsCard(),
-                ],
+                itemCount: bookingPgList?.length ?? 0,
+                itemBuilder: (context, index) {
+                  return BookingsCard(
+                    bookingPg:
+                        bookingPgList != null ? bookingPgList![index] : null,
+                  );
+                },
               ),
             ),
           ],
@@ -47,7 +56,11 @@ class BookingsScreen extends StatelessWidget {
 }
 
 class BookingsCard extends StatelessWidget {
-  const BookingsCard({super.key});
+  final BookingListModel? bookingPg;
+  const BookingsCard({
+    super.key,
+    this.bookingPg,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +102,9 @@ class BookingsCard extends StatelessWidget {
             ),
             child: CachedNetworkImage(
               fit: BoxFit.cover,
+              height: context.height,
               width: context.width * 0.3,
-              imageUrl:
-                  "https://lh3.googleusercontent.com/p/AF1QipNqVC0y-ddz88RrR7UhllUgpwfVMMK72-D_-6KO=s1360-w1360-h1020",
+              imageUrl: bookingPg?.pgDetails?.img1 ?? '',
               progressIndicatorBuilder: (context, url, downloadProgress) =>
                   Shimmer.fromColors(
                 baseColor: Colors.grey.shade300,
@@ -136,12 +149,12 @@ class BookingsCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'VENKATESWARA PG GENTS HOSTEL',
+                          bookingPg?.pgDetails?.pgName ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                           ),
                         ),
@@ -154,15 +167,21 @@ class BookingsCard extends StatelessWidget {
                           horizontal: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.green.shade50,
+                          color:
+                              bookingPg != null && bookingPg?.booked == 'Booked'
+                                  ? Colors.green.shade50
+                                  : Colors.red.shade50,
                           borderRadius: BorderRadius.circular(
                             5,
                           ),
                         ),
-                        child: const Text(
-                          'Booked',
+                        child: Text(
+                          bookingPg?.booked ?? '',
                           style: TextStyle(
-                            color: Colors.green,
+                            color: bookingPg != null &&
+                                    bookingPg?.booked == 'Booked'
+                                ? Colors.green
+                                : Colors.red,
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
                           ),
@@ -175,7 +194,7 @@ class BookingsCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Expanded(
                               child: Column(
@@ -185,12 +204,12 @@ class BookingsCard extends StatelessWidget {
                                     maxLines: 2,
                                     softWrap: true,
                                     overflow: TextOverflow.ellipsis,
-                                    'No87, Venkateswar PG Hostel, 16, 3rd Main Rd, Venkateswara Nagar, Velachery, Chennai, Tamil Nadu 600042',
-                                    style: TextStyle(
+                                    bookingPg?.pgDetails?.pgAddress ?? '',
+                                    style: const TextStyle(
                                       fontSize: 14,
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     'Chennai',
                                     style: TextStyle(
                                       fontSize: 14,
@@ -199,12 +218,12 @@ class BookingsCard extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Text(
-                              '₹7,000',
-                              style: TextStyle(
+                              formatAmount(bookingPg?.pgDetails?.amount),
+                              style: const TextStyle(
                                 fontSize: 24,
                               ),
                             ),
@@ -219,25 +238,37 @@ class BookingsCard extends StatelessWidget {
                                 horizontal: 5,
                               ),
                               decoration: BoxDecoration(
-                                // color: const Color.fromARGB(
-                                //   100,
-                                //   255,
-                                //   0,
-                                //   0,
-                                // ), // Transparent red background
-                                color: const Color.fromARGB(
-                                  100,
-                                  0,
-                                  0,
-                                  0,
-                                ),
+                                color: getPgCategory(
+                                              pgCategory: bookingPg
+                                                  ?.pgDetails?.pgCategory,
+                                            ) ==
+                                            'Boys PG' ||
+                                        getPgCategory(
+                                              pgCategory: bookingPg
+                                                  ?.pgDetails?.pgCategory,
+                                            ) ==
+                                            'Co-Living'
+                                    ? const Color.fromARGB(
+                                        100,
+                                        0,
+                                        0,
+                                        0,
+                                      )
+                                    : const Color.fromARGB(
+                                        100,
+                                        255,
+                                        0,
+                                        0,
+                                      ), // Transparent red background,
                                 borderRadius: BorderRadius.circular(
                                   5,
                                 ),
                               ),
-                              child: const Text(
-                                'Boys PG',
-                                style: TextStyle(
+                              child: Text(
+                                getPgCategory(
+                                  pgCategory: bookingPg?.pgDetails?.pgCategory,
+                                ),
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.white,
                                 ),
@@ -247,6 +278,9 @@ class BookingsCard extends StatelessWidget {
                               onPressed: () {
                                 Navigator.of(context).pushNamed(
                                   bookingDetailsRoute,
+                                  arguments: {
+                                    'bookingPg': bookingPg,
+                                  },
                                 );
                               },
                               child: const Text(

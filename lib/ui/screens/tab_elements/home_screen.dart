@@ -40,6 +40,7 @@ class HomeScreen extends StatelessWidget {
             ),
             SearchField(
               currentAddress: currentAddress,
+              onTapSave: onTapSave,
             ),
             SizedBox(
               height: context.height * 0.01,
@@ -201,7 +202,12 @@ class Banner extends StatelessWidget {
 
 class SearchField extends StatefulWidget {
   final String currentAddress;
-  const SearchField({super.key, required this.currentAddress});
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  const SearchField({
+    super.key,
+    required this.currentAddress,
+    this.onTapSave,
+  });
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -255,9 +261,9 @@ class _SearchFieldState extends State<SearchField> {
               Expanded(
                 child: TextField(
                   onTap: () {
-                    Navigator.of(context).pushNamed(
-                      searchRoute,
-                    );
+                    Navigator.of(context).pushNamed(searchRoute, arguments: {
+                      'onTapSave': widget.onTapSave,
+                    });
                   },
                   autofocus: false,
                   enableInteractiveSelection: false,
@@ -398,7 +404,11 @@ class NearByPGs extends StatelessWidget {
                 right: 6,
               ),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed(searchRoute, arguments: {
+                    'onTapSave': onTapSave,
+                  });
+                },
                 child: const Text(
                   "see all",
                   style: TextStyle(
@@ -430,9 +440,10 @@ class NearByPGs extends StatelessWidget {
                     ? pgList![index]!.isSaved
                     : false,
                 onTap: () {
-                  Navigator.of(context).pushNamed(
-                    pgDetailsRoute,
-                  );
+                  Navigator.of(context).pushNamed(pgDetailsRoute, arguments: {
+                    'pgDetails': pgList != null ? pgList![index] : null,
+                    'onTapSave': onTapSave,
+                  });
                 },
               );
             },

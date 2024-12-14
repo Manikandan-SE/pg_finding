@@ -86,7 +86,8 @@ class AppServices {
     var userId = tempUserId != null ? '$tempUserId' : getUserId();
 
     var requestUrl =
-        '$baseUrl/filtered?pgName=${pgName ?? ''.trim()}&pgType=${pgType ?? ''.trim()}&pgCategory=${pgCategory ?? ''.trim()}&roomCategory=${roomCategory ?? ''}&city=${city ?? ''.trim()}&userId=${userId ?? ''}'.trim();
+        '$baseUrl/filtered?pgName=${pgName ?? ''.trim()}&pgType=${pgType ?? ''.trim()}&pgCategory=${pgCategory ?? ''.trim()}&roomCategory=${roomCategory ?? ''}&city=${city ?? ''.trim()}&userId=${userId ?? ''}'
+            .trim();
 
     try {
       // Send HTTP GET request
@@ -185,7 +186,7 @@ class AppServices {
 
     try {
       // Send HTTP GET request
-      final response = await dio.post(requestUrl);
+      final response = await dio.get(requestUrl);
 
       if (response.statusCode == 200) {
         List<FilterPgModel> data =
@@ -201,7 +202,7 @@ class AppServices {
     return null;
   }
 
-  Future<bool> postSave({
+  Future<void> postSave({
     int? pgId,
     bool? isSaved,
   }) async {
@@ -212,17 +213,84 @@ class AppServices {
 
     try {
       // Send HTTP GET request
-      final response = await dio.get(requestUrl);
+      final response = await dio.post(requestUrl);
 
       if (response.statusCode == 200) {
-        return true;
       } else {
         print('Failed to postSave: ${response.statusCode}');
-        return false;
       }
     } catch (e) {
       print('Failed to postSave: $e');
     }
-    return false;
+  }
+
+  Future<void> postBookPg({
+    int? pgId,
+    String? booked,
+    String? amount,
+  }) async {
+    var baseUrl = getBaseUrl();
+    var userId = getUserId();
+
+    var requestUrl =
+        '$baseUrl/book?pgId=$pgId&userId=$userId&booked=$booked&amount=$amount';
+
+    try {
+      // Send HTTP GET request
+      final response = await dio.post(requestUrl);
+
+      if (response.statusCode == 200) {
+      } else {
+        print('Failed to postBookPg: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Failed to postBookPg: $e');
+    }
+  }
+
+  Future<List<BookingListModel?>?> fetchBookingList() async {
+    var baseUrl = getBaseUrl();
+    var userId = getUserId();
+
+    var requestUrl = '$baseUrl/booking/get/byid?userId=$userId';
+
+    try {
+      // Send HTTP GET request
+      final response = await dio.get(requestUrl);
+
+      if (response.statusCode == 200) {
+        List<BookingListModel> data =
+            bookingListModelFromJson(json.encode(response.data));
+        return data;
+      } else {
+        print('Failed to fetchBookingList: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Failed to fetchBookingList: $e');
+    }
+    return null;
+  }
+
+  Future<void> patchCancelBookedpg({
+    int? pgId,
+    String? status,
+  }) async {
+    var baseUrl = getBaseUrl();
+    var userId = getUserId();
+
+    var requestUrl = '$baseUrl/update?pgId=$pgId&userId=$userId&status=$status';
+
+    try {
+      // Send HTTP GET request
+      final response = await dio.put(requestUrl);
+
+      if (response.statusCode == 200) {
+      } else {
+        print('Failed to patchCancelBookedpg: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Failed to patchCancelBookedpg: $e');
+    }
   }
 }

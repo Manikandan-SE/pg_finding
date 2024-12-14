@@ -15,16 +15,26 @@ class AppRouter {
           builder: (_) => const PGScreen(),
         );
       case searchRoute:
+        final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (_) => const PgSearchScreen(),
+          builder: (_) => PgSearchScreen(
+            onTapSave: args?['onTapSave'],
+          ),
         );
       case pgDetailsRoute:
+        final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (_) => const PgDetailsScreen(),
+          builder: (_) => PgDetailsScreen(
+            pgDetails: args?['pgDetails'],
+            onTapSave: args?['onTapSave'],
+          ),
         );
       case bookingDetailsRoute:
+        final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (_) => const BookingDetailsScreen(),
+          builder: (_) => BookingDetailsScreen(
+            bookingPg: args?['bookingPg'],
+          ),
         );
       case profileRoute:
         return MaterialPageRoute(

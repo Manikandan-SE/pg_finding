@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:pg_finding/utils/index.dart';
 
+import '../../../models/index.dart';
 import '../../widgets/index.dart';
 
 class SavedPgScreen extends StatelessWidget {
-  const SavedPgScreen({super.key});
+  final List<FilterPgModel?>? savedPgList;
+  final Function({FilterPgModel? pgDetails})? onTapSavePGInSavedList;
+  const SavedPgScreen({
+    super.key,
+    this.onTapSavePGInSavedList,
+    this.savedPgList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,45 +33,34 @@ class SavedPgScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => SizedBox(
+                  height: context.width * 0.04,
+                ),
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
                 ),
-                children: [
-                  PgCard(
+                itemCount: savedPgList?.length ?? 0,
+                itemBuilder: (context, index) {
+                  return PgCard(
+                    pgDetails: savedPgList != null ? savedPgList![index] : null,
+                    // width: context.width * 0.8,
                     height: context.height * 0.25,
-                  ),
-                  SizedBox(
-                    height: context.width * 0.04,
-                  ),
-                  PgCard(
-                    height: context.height * 0.25,
-                  ),
-                  SizedBox(
-                    height: context.width * 0.04,
-                  ),
-                  PgCard(
-                    height: context.height * 0.25,
-                  ),
-                  SizedBox(
-                    height: context.width * 0.04,
-                  ),
-                  PgCard(
-                    height: context.height * 0.25,
-                  ),
-                  SizedBox(
-                    height: context.width * 0.04,
-                  ),
-                  PgCard(
-                    height: context.height * 0.25,
-                  ),
-                  SizedBox(
-                    height: context.width * 0.04,
-                  ),
-                  PgCard(
-                    height: context.height * 0.25,
-                  ),
-                ],
+                    onTapSave: onTapSavePGInSavedList,
+                    isSaved: true,
+                    onTap: () {
+                      Navigator.of(context)
+                          .pushNamed(pgDetailsRoute, arguments: {
+                        'pgDetails': savedPgList != null
+                            ? savedPgList![index]?.copyWith(
+                                isSaved: true,
+                              )
+                            : null,
+                        'onTapSave': onTapSavePGInSavedList,
+                      });
+                    },
+                  );
+                },
               ),
             ),
           ],

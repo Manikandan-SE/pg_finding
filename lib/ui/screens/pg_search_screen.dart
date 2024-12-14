@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 
+import '../../models/index.dart';
 import '../../utils/index.dart';
 import '../widgets/index.dart';
 
 class PgSearchScreen extends StatefulWidget {
-  const PgSearchScreen({super.key});
+  final Function({FilterPgModel? pgDetails})? onTapSave;
+  const PgSearchScreen({
+    super.key,
+    this.onTapSave,
+  });
 
   @override
   State<PgSearchScreen> createState() => _PgSearchScreenState();
@@ -16,14 +21,53 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
   var selectedPgType = '';
   var selectedRoomType = '';
 
+  TextEditingController textEditingController = TextEditingController();
+
+  FocusNode focusNode = FocusNode();
+
+  List<SuggestionModel?>? suggestionList;
+
+  List<FilterPgModel?>? searchedPGList;
+
+  bool isShowSuggestionList = true;
+
+  SuggestionModel? cachedSuggestion;
+
   void onApplyFilter({
     required String pgType,
     required String roomType,
-  }) {
+  }) async {
     setState(() {
       selectedPgType = pgType;
       selectedRoomType = roomType;
     });
+
+    // setState(() {
+    //   searchedPGList?.clear();
+    // });
+
+    var tempSearchedPgList = await AppServices().fetchFilterPG(
+          city: (cachedSuggestion?.city ?? '').trim(),
+          pgName: (cachedSuggestion?.pg_name ?? '').trim(),
+          pgCategory: pgType == 'Boys'
+              ? 'Boy'
+              : pgType == 'Girls'
+                  ? 'Girl'
+                  : pgType,
+          pgType: roomType == 'Double Sharing'
+              ? 'Double'
+              : roomType == 'Triple Sharing'
+                  ? 'Triple'
+                  : roomType == 'Quad Sharing'
+                      ? 'Quad'
+                      : roomType,
+        ) ??
+        [];
+
+    setState(() {
+      searchedPGList = tempSearchedPgList;
+    });
+
     Navigator.of(context).pop();
   }
 
@@ -35,6 +79,72 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
       selectedPgType = '';
       selectedRoomType = '';
     });
+  }
+
+  void onSearchPG(String value) async {
+    var query = value.trim();
+    if (query.length > 1) {
+      var tempSuggestionList =
+          await AppServices().fetchSuggestion(param: query.toLowerCase());
+      setState(() {
+        suggestionList = tempSuggestionList;
+      });
+    }
+  }
+
+  void onTapSuggestion({SuggestionModel? suggestion}) async {
+    setState(() {
+      isShowSuggestionList = false;
+      searchedPGList?.clear();
+      cachedSuggestion = suggestion;
+    });
+
+    var tempSearchedPgList = await AppServices().fetchFilterPG(
+          city: (suggestion?.city ?? '').trim(),
+          pgName: (suggestion?.pg_name ?? '').trim(),
+        ) ??
+        [];
+
+    setState(() {
+      searchedPGList = tempSearchedPgList;
+    });
+    textEditingController.text = suggestion != null
+        ? '${suggestion.pg_name != null && suggestion.pg_name!.isNotEmpty ? '${suggestion.pg_name}, ' : ''}${suggestion.city ?? ''}, ${suggestion.area ?? ''}'
+            .trim()
+        : '';
+  }
+
+  void onTapSave({FilterPgModel? pgDetails}) {
+    if (pgDetails == null) return;
+    var tempSearchedPgList =
+        List<FilterPgModel>.from(searchedPGList != null ? searchedPGList! : []);
+    setState(() {
+      searchedPGList = tempSearchedPgList.map((pg) {
+        if (pg.pgId == pgDetails.pgId) {
+          postSave(
+            pgDetails: pgDetails,
+          );
+          return pg.copyWith(
+            isSaved: pgDetails.isSaved != null ? !pgDetails.isSaved! : false,
+          );
+        }
+        return pg;
+      }).toList();
+    });
+    if (widget.onTapSave != null) {
+      widget.onTapSave!(
+        pgDetails: pgDetails,
+      );
+    }
+  }
+
+  void postSave({FilterPgModel? pgDetails}) async {
+    await AppServices().postSave(
+      pgId: pgDetails?.pgId,
+      isSaved: pgDetails != null && pgDetails.isSaved != null
+          ? !pgDetails.isSaved!
+          : false,
+    );
   }
 
   @override
@@ -54,7 +164,18 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
                   children: [
                     Expanded(
                       child: TextField(
-                        onChanged: (value) {},
+                        autofocus: true,
+                        focusNode: focusNode,
+                        onTapOutside: (event) {
+                          focusNode.unfocus();
+                        },
+                        controller: textEditingController,
+                        onChanged: onSearchPG,
+                        onTap: () {
+                          setState(() {
+                            isShowSuggestionList = true;
+                          });
+                        },
                         cursorColor: Colors.black54,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
@@ -70,8 +191,17 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
                               Icons.arrow_back,
                             ),
                           ),
-                          suffixIcon: const Icon(
-                            Icons.close,
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              textEditingController.clear();
+                              setState(() {
+                                isShowSuggestionList = true;
+                              });
+                              focusNode.requestFocus();
+                            },
+                            child: const Icon(
+                              Icons.close,
+                            ),
                           ),
                           hintText: 'Search PG',
                           filled: true,
@@ -136,82 +266,83 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
                 SizedBox(
                   height: context.height * 0.01,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Find your perfect PG",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black45,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Row(
-                        children: [
-                          Icon(
-                            LineIcons.mapMarker,
-                            size: 16,
-                          ),
-                          Text(
-                            'Map View',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
                 Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                    ),
-                    children: [
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                      SizedBox(
-                        height: context.width * 0.04,
-                      ),
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                      SizedBox(
-                        height: context.width * 0.04,
-                      ),
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                      SizedBox(
-                        height: context.width * 0.04,
-                      ),
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                      SizedBox(
-                        height: context.width * 0.04,
-                      ),
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                      SizedBox(
-                        height: context.width * 0.04,
-                      ),
-                      PgCard(
-                        height: context.height * 0.25,
-                      ),
-                    ],
-                  ),
+                  child: isShowSuggestionList
+                      ? Expanded(
+                          child: SuggestionList(
+                            suggestionList: suggestionList,
+                            onTapSuggestion: onTapSuggestion,
+                          ),
+                        )
+                      : Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Find your perfect PG",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {},
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        LineIcons.mapMarker,
+                                        size: 16,
+                                      ),
+                                      Text(
+                                        'Map View',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                separatorBuilder: (context, index) => SizedBox(
+                                  height: context.width * 0.04,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                itemCount: searchedPGList?.length ?? 0,
+                                itemBuilder: (context, index) {
+                                  return PgCard(
+                                    height: context.height * 0.25,
+                                    pgDetails: searchedPGList != null
+                                        ? searchedPGList![index]
+                                        : null,
+                                    onTapSave: onTapSave,
+                                    isSaved: searchedPGList != null &&
+                                            searchedPGList![index] != null
+                                        ? searchedPGList![index]!.isSaved
+                                        : false,
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          pgDetailsRoute,
+                                          arguments: {
+                                            'pgDetails': searchedPGList != null
+                                                ? searchedPGList![index]
+                                                : null,
+                                            'onTapSave': onTapSave,
+                                          });
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
-
-                // const Expanded(
-                //   child: SuggestionList(),
-                // ),
               ],
             ),
           ),
@@ -221,6 +352,7 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
   }
 
   void showFilters() {
+    if (isShowSuggestionList) return;
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -236,85 +368,74 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
 }
 
 class SuggestionList extends StatelessWidget {
-  const SuggestionList({super.key});
+  final List<SuggestionModel?>? suggestionList;
+  final Function({SuggestionModel? suggestion})? onTapSuggestion;
+  const SuggestionList({
+    super.key,
+    this.suggestionList,
+    this.onTapSuggestion,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    if (suggestionList == null ||
+        (suggestionList != null && suggestionList!.isEmpty)) {
+      return const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Search PG by name, Area, City',
+          ),
+        ],
+      );
+    }
+    return ListView.separated(
+      separatorBuilder: (context, index) => SizedBox(
+        height: context.height * 0.015,
+      ),
       padding: const EdgeInsets.symmetric(
         vertical: 16,
       ),
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 12,
+      itemCount: suggestionList?.length ?? 0,
+      itemBuilder: (context, index) => Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.black12,
+          borderRadius: BorderRadius.circular(
+            10,
           ),
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(
-              10,
-            ),
-          ),
-          child: const Row(
+        ),
+        child: GestureDetector(
+          onTap: () {
+            if (onTapSuggestion != null) {
+              onTapSuggestion!(
+                suggestion: suggestionList![index],
+              );
+            }
+          },
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Velachery,Chennai'),
-              Icon(
+              Expanded(
+                child: Text(
+                  suggestionList != null && suggestionList![index] != null
+                      ? '${suggestionList![index]?.pg_name != null && suggestionList![index]!.pg_name!.isNotEmpty ? '${suggestionList![index]?.pg_name}, ' : ''}${suggestionList![index]?.city ?? ''}, ${suggestionList![index]?.area ?? ''}'
+                          .trim()
+                      : '',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              const Icon(
                 Icons.arrow_forward,
               ),
             ],
           ),
         ),
-        SizedBox(
-          height: context.height * 0.015,
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 12,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(
-              10,
-            ),
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Vimala PG,Velachery,Chennai'),
-              Icon(
-                Icons.arrow_forward,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: context.height * 0.015,
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 12,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(
-              10,
-            ),
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Bubu PG,Velachery,Chennai'),
-              Icon(
-                Icons.arrow_forward,
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

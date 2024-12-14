@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: 18,
                           ),
                           Text(
-                            getUserData()?.name ?? 'Pookie',
+                            getUserData()?.name ?? 'Buddy',
                             style: const TextStyle(
                               fontSize: 22,
                             ),
