@@ -41,6 +41,16 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
         );
+      case mapRoute:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => MapScreen(
+            locationData: args?['locationData'],
+            onTapSave: args?['onTapSave'],
+            pgList: args?['pgList'],
+            fromSearchRoute: args?['fromSearchRoute'],
+          ),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

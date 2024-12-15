@@ -286,7 +286,15 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    Navigator.of(context)
+                                        .pushNamed(mapRoute, arguments: {
+                                      'locationData': getLocationData(),
+                                      'onTapSave': onTapSave,
+                                      'pgList': searchedPGList,
+                                      'fromSearchRoute': true,
+                                    });
+                                  },
                                   child: const Row(
                                     children: [
                                       Icon(

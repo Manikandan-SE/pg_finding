@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 
 import '../models/index.dart';
 import 'index.dart';
@@ -125,4 +126,24 @@ String formatAmount(String? amount) {
     decimalDigits: 0,
   );
   return formatCurrency.format(double.tryParse(amount) ?? 0);
+}
+
+Future<void> setLocationData(LocationData locationData) async {
+  await SharedPreferencesUtils.setString(
+    locationDataKey,
+    jsonEncode(
+      jsonEncode(
+        locationData,
+      ),
+    ),
+  );
+}
+
+LocationData? getLocationData() {
+  String locationDataString = SharedPreferencesUtils.getString(locationDataKey);
+  if (locationDataString.isNotEmpty) {
+    Map<String, dynamic> locationJsonData = jsonDecode(locationDataString);
+    return LocationData.fromMap(locationJsonData);
+  }
+  return null;
 }

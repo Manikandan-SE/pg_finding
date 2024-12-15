@@ -13,11 +13,13 @@ class MapScreen extends StatefulWidget {
   final LocationData? locationData;
   final List<FilterPgModel?>? pgList;
   final Function({FilterPgModel? pgDetails})? onTapSave;
+  final bool? fromSearchRoute;
   const MapScreen({
     super.key,
     this.locationData,
     this.pgList,
     this.onTapSave,
+    this.fromSearchRoute,
   });
 
   @override
@@ -288,6 +290,49 @@ class _MapScreenState extends State<MapScreen> {
             width: 200,
             offset: 70,
           ),
+          widget.fromSearchRoute != null && widget.fromSearchRoute!
+              ? Positioned(
+                  top: context.height * 0.07,
+                  left: context.height * 0.02,
+                  child: Container(
+                    width: 45,
+                    height: 45,
+                    margin: const EdgeInsets.all(
+                      6,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                      color: const Color.fromARGB(
+                        227,
+                        255,
+                        255,
+                        255,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 0.5,
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      color: Colors.black,
+                      iconSize: 30,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(
+                        Icons.close,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
       floatingActionButton: FloatingActionButton(

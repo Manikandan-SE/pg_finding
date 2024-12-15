@@ -55,6 +55,7 @@ class _PGScreenState extends State<PGScreen> {
       if (locationData != null &&
           locationData!.latitude != null &&
           locationData!.longitude != null) {
+        await setLocationData(locationData!);
         _getAddressFromLatLng(
           latitude: locationData!.latitude!,
           longitude: locationData!.longitude!,
