@@ -7,9 +7,11 @@ import '../../../models/index.dart';
 
 class BookingsScreen extends StatelessWidget {
   final List<BookingListModel?>? bookingPgList;
+  final Function({BookingListModel? bookingDetails})? onChangeBookingStatus;
   const BookingsScreen({
     super.key,
     this.bookingPgList,
+    this.onChangeBookingStatus,
   });
 
   @override
@@ -44,6 +46,7 @@ class BookingsScreen extends StatelessWidget {
                   return BookingsCard(
                     bookingPg:
                         bookingPgList != null ? bookingPgList![index] : null,
+                    onChangeBookingStatus: onChangeBookingStatus,
                   );
                 },
               ),
@@ -57,9 +60,11 @@ class BookingsScreen extends StatelessWidget {
 
 class BookingsCard extends StatelessWidget {
   final BookingListModel? bookingPg;
+  final Function({BookingListModel? bookingDetails})? onChangeBookingStatus;
   const BookingsCard({
     super.key,
     this.bookingPg,
+    this.onChangeBookingStatus,
   });
 
   @override
@@ -280,6 +285,8 @@ class BookingsCard extends StatelessWidget {
                                   bookingDetailsRoute,
                                   arguments: {
                                     'bookingPg': bookingPg,
+                                    'onChangeBookingStatus':
+                                        onChangeBookingStatus,
                                   },
                                 );
                               },

@@ -49,6 +49,8 @@ class FilterPgModel {
   final String? roomCategory;
   @JsonKey(name: "isSaved")
   final bool? isSaved;
+  @JsonKey(name: "booking_status")
+  final String? booking_status;
 
   FilterPgModel({
     this.pgId,
@@ -67,6 +69,7 @@ class FilterPgModel {
     this.amount,
     this.roomCategory,
     this.isSaved,
+    this.booking_status,
   });
 
   factory FilterPgModel.fromJson(Map<String, dynamic> json) =>

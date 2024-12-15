@@ -50,6 +50,21 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
     setState(() {
       isSaved = widget.pgDetails?.isSaved ?? false;
     });
+    checkPGAlreadyBooked();
+  }
+
+  void checkPGAlreadyBooked() async {
+    var tempList = await AppServices().fetchFilterPG(
+      pgId: '${widget.pgDetails?.pgId ?? ''}',
+    );
+    if (tempList != null &&
+        tempList.isNotEmpty &&
+        tempList[0]?.booking_status != null &&
+        tempList[0]?.booking_status == 'Booked') {
+      setState(() {
+        isBooked = true;
+      });
+    }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
@@ -61,6 +76,7 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
       amount: widget.pgDetails?.amount ?? '0',
       booked: 'Booked',
       pgId: widget.pgDetails?.pgId ?? 0,
+      transactionId: response.paymentId ?? '',
     );
     print('payment success ${response.paymentId}');
   }

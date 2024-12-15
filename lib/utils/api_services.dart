@@ -74,19 +74,21 @@ class AppServices {
     return null;
   }
 
-  Future<List<FilterPgModel?>?> fetchFilterPG(
-      {String? tempBaseUrl,
-      int? tempUserId,
-      String? pgName,
-      String? pgType,
-      String? pgCategory,
-      String? roomCategory,
-      String? city}) async {
+  Future<List<FilterPgModel?>?> fetchFilterPG({
+    String? tempBaseUrl,
+    int? tempUserId,
+    String? pgName,
+    String? pgType,
+    String? pgCategory,
+    String? roomCategory,
+    String? city,
+    String? pgId,
+  }) async {
     var baseUrl = tempBaseUrl ?? getBaseUrl();
     var userId = tempUserId != null ? '$tempUserId' : getUserId();
 
     var requestUrl =
-        '$baseUrl/filtered?pgName=${pgName ?? ''.trim()}&pgType=${pgType ?? ''.trim()}&pgCategory=${pgCategory ?? ''.trim()}&roomCategory=${roomCategory ?? ''}&city=${city ?? ''.trim()}&userId=${userId ?? ''}'
+        '$baseUrl/filtered?pgName=${pgName ?? ''.trim()}&pgType=${pgType ?? ''.trim()}&pgCategory=${pgCategory ?? ''.trim()}&roomCategory=${roomCategory ?? ''}&city=${city ?? ''.trim()}&userId=${userId ?? ''}&pgId=${pgId ?? ''.trim()}'
             .trim();
 
     try {
@@ -228,12 +230,13 @@ class AppServices {
     int? pgId,
     String? booked,
     String? amount,
+    String? transactionId,
   }) async {
     var baseUrl = getBaseUrl();
     var userId = getUserId();
 
     var requestUrl =
-        '$baseUrl/book?pgId=$pgId&userId=$userId&booked=$booked&amount=$amount';
+        '$baseUrl/book?pgId=$pgId&userId=$userId&booked=$booked&amount=$amount&transactionId=${transactionId ?? ''.trim()}';
 
     try {
       // Send HTTP GET request

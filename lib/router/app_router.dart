@@ -34,6 +34,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => BookingDetailsScreen(
             bookingPg: args?['bookingPg'],
+            onChangeBookingStatus: args?['onChangeBookingStatus'],
           ),
         );
       case profileRoute:

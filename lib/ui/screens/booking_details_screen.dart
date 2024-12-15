@@ -14,9 +14,11 @@ import '../../utils/index.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
   final BookingListModel? bookingPg;
+  final Function({BookingListModel? bookingDetails})? onChangeBookingStatus;
   const BookingDetailsScreen({
     super.key,
     this.bookingPg,
+    this.onChangeBookingStatus,
   });
 
   @override
@@ -25,6 +27,19 @@ class BookingDetailsScreen extends StatefulWidget {
 
 class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
   bool isInvoiceLoading = false;
+
+  String? bookingStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      bookingStatus =
+          widget.bookingPg != null && widget.bookingPg!.booked != null
+              ? widget.bookingPg!.booked
+              : '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +51,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
         actions: [
           widget.bookingPg != null &&
                   widget.bookingPg!.booked != null &&
-                  widget.bookingPg!.booked == 'Cancelled'
+                  bookingStatus == 'Cancelled'
               ? const SizedBox()
               : PopupMenuButton<String>(
                   position: PopupMenuPosition.under,
@@ -81,6 +96,14 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                                   );
                                   // Add your cancellation logic here
                                   Navigator.of(context).pop();
+                                  if (widget.onChangeBookingStatus != null) {
+                                    widget.onChangeBookingStatus!(
+                                      bookingDetails: widget.bookingPg,
+                                    );
+                                  }
+                                  setState(() {
+                                    bookingStatus = 'Cancelled';
+                                  });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
@@ -122,8 +145,155 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
-              Column(
-                children: [Text(widget.bookingPg?.pgDetails?.pgName ?? '')],
+              Container(
+                padding: const EdgeInsets.all(
+                  16,
+                ),
+                margin: const EdgeInsets.all(
+                  16,
+                ),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    5,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    widget.bookingPg != null &&
+                            widget.bookingPg!.booked != null &&
+                            bookingStatus == 'Cancelled'
+                        ? const SizedBox()
+                        : Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(
+                                  8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.yellow.shade100,
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Transaction ID:',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      widget.bookingPg?.transactionId ?? '',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: context.height * 0.03,
+                              ),
+                            ],
+                          ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        BookingInfo(
+                          title: 'Booking ID',
+                          value: '${widget.bookingPg?.bookingId ?? ''}',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'Booking Date',
+                          value: widget.bookingPg?.bookingDate ?? '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'Booking Status',
+                          value: bookingStatus ?? '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'PG Name',
+                          value: widget.bookingPg?.pgDetails?.pgName ?? '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'PG Address',
+                          value: widget.bookingPg?.pgDetails?.pgAddress ?? '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'Booked Amount',
+                          value: formatAmount(
+                            widget.bookingPg?.pgDetails?.amount,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'Room Category',
+                          value: getPgType(
+                            pgType: widget.bookingPg?.pgDetails?.pgType,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'PG Category',
+                          value: getPgCategory(
+                            pgCategory: widget.bookingPg?.pgDetails?.pgCategory,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'PG Owner Name',
+                          value:
+                              widget.bookingPg?.pgDetails?.owner?.ownerName ??
+                                  '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        BookingInfo(
+                          title: 'PG Owner Ph No',
+                          value: widget.bookingPg?.pgDetails?.owner
+                                  ?.ownerPhoneNumber ??
+                              '',
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               )
             ],
           ),
@@ -131,7 +301,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       ),
       bottomNavigationBar: widget.bookingPg != null &&
               widget.bookingPg!.booked != null &&
-              widget.bookingPg!.booked == 'Cancelled'
+              bookingStatus == 'Cancelled'
           ? const SizedBox()
           : Container(
               padding: const EdgeInsets.all(
@@ -312,14 +482,15 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           pw.Text(
                             pgDetails?.pgName ?? '',
                           ),
-                          pw.Expanded(
-                            child: pw.Text(
-                              pgDetails?.pgAddress ?? '',
-                              style: const pw.TextStyle(
-                                fontSize: 8,
-                              ),
+                          // pw.Expanded(
+                          //   child:
+                          pw.Text(
+                            pgDetails?.pgAddress ?? '',
+                            style: const pw.TextStyle(
+                              fontSize: 8,
                             ),
                           ),
+                          // ),
                         ],
                       ),
                     ),
@@ -356,7 +527,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                           height: 5,
                         ),
                         pw.Text(
-                          '1342331',
+                          bookingPg?.transactionId ?? '',
                         ),
                       ],
                     ),
@@ -523,5 +694,46 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     setState(() {
       isInvoiceLoading = false;
     });
+  }
+}
+
+class BookingInfo extends StatelessWidget {
+  final String title;
+  final String value;
+  const BookingInfo({
+    super.key,
+    required this.title,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Text(
+            '$title:',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

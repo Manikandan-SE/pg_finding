@@ -26,6 +26,7 @@ FilterPgModel _$FilterPgModelFromJson(Map<String, dynamic> json) =>
       amount: json['amount'] as String?,
       roomCategory: json['roomCategory'] as String?,
       isSaved: json['isSaved'] as bool?,
+      booking_status: json['booking_status'] as String?,
     );
 
 Map<String, dynamic> _$FilterPgModelToJson(FilterPgModel instance) =>
@@ -46,6 +47,7 @@ Map<String, dynamic> _$FilterPgModelToJson(FilterPgModel instance) =>
       'amount': instance.amount,
       'roomCategory': instance.roomCategory,
       'isSaved': instance.isSaved,
+      'booking_status': instance.booking_status,
     };
 
 Owner _$OwnerFromJson(Map<String, dynamic> json) => Owner(

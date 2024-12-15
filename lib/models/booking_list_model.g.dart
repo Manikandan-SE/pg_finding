@@ -18,6 +18,7 @@ BookingListModel _$BookingListModelFromJson(Map<String, dynamic> json) =>
       bookingDate: json['bookingDate'] as String?,
       booked: json['booked'] as String?,
       amount: json['amount'] as String?,
+      transactionId: json['transactionId'] as String?,
     );
 
 Map<String, dynamic> _$BookingListModelToJson(BookingListModel instance) =>
@@ -28,6 +29,7 @@ Map<String, dynamic> _$BookingListModelToJson(BookingListModel instance) =>
       'bookingDate': instance.bookingDate,
       'booked': instance.booked,
       'amount': instance.amount,
+      'transactionId': instance.transactionId,
     };
 
 PgDetails _$PgDetailsFromJson(Map<String, dynamic> json) => PgDetails(
@@ -49,6 +51,7 @@ PgDetails _$PgDetailsFromJson(Map<String, dynamic> json) => PgDetails(
       amount: json['amount'] as String?,
       isSaved: json['isSaved'] as bool?,
       roomCategory: json['roomCategory'] as String?,
+      booking_status: json['booking_status'] as String?,
     );
 
 Map<String, dynamic> _$PgDetailsToJson(PgDetails instance) => <String, dynamic>{
@@ -68,6 +71,7 @@ Map<String, dynamic> _$PgDetailsToJson(PgDetails instance) => <String, dynamic>{
       'amount': instance.amount,
       'isSaved': instance.isSaved,
       'roomCategory': instance.roomCategory,
+      'booking_status': instance.booking_status,
     };
 
 BookingListOwner _$BookingListOwnerFromJson(Map<String, dynamic> json) =>

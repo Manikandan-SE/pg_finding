@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
 
 import '../../models/index.dart';
@@ -177,10 +176,10 @@ class _PgSearchScreenState extends State<PgSearchScreen> {
                           });
                         },
                         cursorColor: Colors.black54,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            searchFieldRegex,
-                          ),
+                        inputFormatters: const [
+                          // FilteringTextInputFormatter.allow(
+                          //   searchFieldRegex,
+                          // ),
                         ],
                         decoration: InputDecoration(
                           prefixIcon: InkWell(

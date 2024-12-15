@@ -29,6 +29,8 @@ class BookingListModel {
   final String? booked;
   @JsonKey(name: "amount")
   final String? amount;
+  @JsonKey(name: "transactionId")
+  final String? transactionId;
 
   BookingListModel({
     this.bookingId,
@@ -37,12 +39,33 @@ class BookingListModel {
     this.bookingDate,
     this.booked,
     this.amount,
+    this.transactionId,
   });
 
   factory BookingListModel.fromJson(Map<String, dynamic> json) =>
       _$BookingListModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$BookingListModelToJson(this);
+
+  BookingListModel copyWith({
+    int? bookingId,
+    User? user,
+    PgDetails? pgDetails,
+    String? bookingDate,
+    String? booked,
+    String? amount,
+    String? transactionId,
+  }) {
+    return BookingListModel(
+      bookingId: bookingId ?? this.bookingId,
+      user: user ?? this.user,
+      pgDetails: pgDetails ?? this.pgDetails,
+      bookingDate: bookingDate ?? this.bookingDate,
+      booked: booked ?? this.booked,
+      amount: amount ?? this.amount,
+      transactionId: transactionId ?? this.transactionId,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -79,6 +102,8 @@ class PgDetails {
   final bool? isSaved;
   @JsonKey(name: "roomCategory")
   final String? roomCategory;
+  @JsonKey(name: "booking_status")
+  final String? booking_status;
 
   PgDetails({
     this.pgId,
@@ -97,6 +122,7 @@ class PgDetails {
     this.amount,
     this.isSaved,
     this.roomCategory,
+    this.booking_status,
   });
 
   factory PgDetails.fromJson(Map<String, dynamic> json) =>
@@ -120,7 +146,8 @@ class BookingListOwner {
     this.ownerPhoneNumber,
   });
 
-  factory BookingListOwner.fromJson(Map<String, dynamic> json) => _$BookingListOwnerFromJson(json);
+  factory BookingListOwner.fromJson(Map<String, dynamic> json) =>
+      _$BookingListOwnerFromJson(json);
 
   Map<String, dynamic> toJson() => _$BookingListOwnerToJson(this);
 }

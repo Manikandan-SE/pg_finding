@@ -262,6 +262,22 @@ class _PGScreenState extends State<PGScreen> {
     });
   }
 
+  void onChangeBookingStatus({BookingListModel? bookingDetails}) {
+    if (bookingDetails == null) return;
+    var tempBookingList = List<BookingListModel>.from(
+        bookingPgList != null ? bookingPgList! : []);
+    setState(() {
+      bookingPgList = tempBookingList.map((pg) {
+        if (pg.pgDetails?.pgId == bookingDetails.pgDetails?.pgId) {
+          return pg.copyWith(
+            booked: 'Cancelled',
+          );
+        }
+        return pg;
+      }).toList();
+    });
+  }
+
 //GeoLocator code
 
   // Future<void> _getCurrentPosition() async {
@@ -342,6 +358,7 @@ class _PGScreenState extends State<PGScreen> {
           ),
           BookingsScreen(
             bookingPgList: bookingPgList,
+            onChangeBookingStatus: onChangeBookingStatus,
           ),
         ],
       ),
