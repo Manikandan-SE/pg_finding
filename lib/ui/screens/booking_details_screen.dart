@@ -283,8 +283,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                         ),
                         BookingInfo(
                           title: 'PG Owner Ph No',
-                          value: widget.bookingPg?.pgDetails?.owner
-                                  ?.ownerPhoneNumber ??
+                          value: widget.bookingPg?.pgDetails?.pgPhoneNumber ??
                               '',
                         ),
                         const SizedBox(

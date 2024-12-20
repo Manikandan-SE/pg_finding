@@ -74,6 +74,7 @@ class _PGScreenState extends State<PGScreen> {
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
+        getPopularPG();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -87,6 +88,7 @@ class _PGScreenState extends State<PGScreen> {
     if (permissionGranted == PermissionStatus.denied) {
       permissionGranted = await location.requestPermission();
       if (permissionGranted == PermissionStatus.denied) {
+        getPopularPG();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Location permissions are denied'),
@@ -96,6 +98,7 @@ class _PGScreenState extends State<PGScreen> {
       }
     }
     if (permissionGranted == PermissionStatus.deniedForever) {
+      getPopularPG();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -120,6 +123,7 @@ class _PGScreenState extends State<PGScreen> {
       getFilterPG(place.subLocality);
       setState(() {});
     }).catchError((e) {
+      getPopularPG();
       if (e is PlatformException) {
         print("PlatformException occurred: ${e.message}");
       } else {
@@ -336,7 +340,6 @@ class _PGScreenState extends State<PGScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // print('userDetails ${jsonEncode(getUserData())}');
     return Scaffold(
       backgroundColor: Colors.white,
       body: IndexedStack(

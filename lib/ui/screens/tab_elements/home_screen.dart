@@ -57,6 +57,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     BrowseByLocality(
                       localityList: localityList,
+                      onTapSave: onTapSave,
                     ),
                     SizedBox(
                       height: context.height * 0.025,
@@ -436,7 +437,9 @@ class NearByPGs extends StatelessWidget {
                 width: context.width * 0.8,
                 height: context.height,
                 onTapSave: onTapSave,
-                isSaved: pgList != null && pgList![index] != null
+                isSaved: pgList != null &&
+                        pgList![index] != null &&
+                        pgList![index]!.isSaved != null
                     ? pgList![index]!.isSaved
                     : false,
                 onTap: () {
@@ -456,9 +459,11 @@ class NearByPGs extends StatelessWidget {
 
 class BrowseByLocality extends StatelessWidget {
   final List<LocalityModel?>? localityList;
+  final Function({FilterPgModel? pgDetails})? onTapSave;
   const BrowseByLocality({
     super.key,
     this.localityList,
+    this.onTapSave,
   });
 
   @override
@@ -489,8 +494,15 @@ class BrowseByLocality extends StatelessWidget {
             ),
             scrollDirection: Axis.horizontal,
             itemCount: localityList?.length ?? 0,
-            itemBuilder: (context, index) => LocalityCard(
-              locality: localityList != null ? localityList![index] : null,
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed(searchRoute, arguments: {
+                  'onTapSave': onTapSave,
+                });
+              },
+              child: LocalityCard(
+                locality: localityList != null ? localityList![index] : null,
+              ),
             ),
           ),
         ),

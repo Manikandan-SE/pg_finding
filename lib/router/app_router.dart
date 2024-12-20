@@ -5,6 +5,20 @@ import '../utils/index.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    // final bool isLoggedIn = getUserData() != null;
+
+    // if (settings.name == '/') { // || settings.name == initRoute || settings.name == pgRoute
+    //   if (isLoggedIn) {
+    //     return MaterialPageRoute(
+    //       builder: (_) => const PGScreen(),
+    //     );
+    //   } else {
+    //     return MaterialPageRoute(
+    //       builder: (_) => const InitScreen(),
+    //     );
+    //   }
+    // }
+
     switch (settings.name) {
       case initRoute:
         return MaterialPageRoute(
@@ -53,14 +67,29 @@ class AppRouter {
         );
       default:
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            body: Center(
-              child: Text(
-                'No route defined for ${settings.name}',
-              ),
-            ),
+          builder: (_) => NoRoute(
+            settings: settings,
           ),
         );
     }
+  }
+}
+
+class NoRoute extends StatelessWidget {
+  final RouteSettings settings;
+  const NoRoute({
+    super.key,
+    required this.settings,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'No route defined for ${settings.name}',
+        ),
+      ),
+    );
   }
 }

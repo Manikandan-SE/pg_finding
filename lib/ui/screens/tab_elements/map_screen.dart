@@ -60,7 +60,8 @@ class _MapScreenState extends State<MapScreen> {
                   'latlng': LatLng(
                     elem?.latitude ?? 0.0,
                     elem?.longitude ?? 0.0,
-                  )
+                  ),
+                  'pgItem': elem,
                 }))
             .toList()
         : [
@@ -68,16 +69,19 @@ class _MapScreenState extends State<MapScreen> {
               'pgId': 1,
               'icon': pgIcon,
               'latlng': const LatLng(12.992733526761468, 80.21139742511788),
+              'pgItem': null,
             },
             {
               'pgId': 2,
               'icon': pgIcon,
               'latlng': const LatLng(13.036682665346392, 80.21054139707249),
+              'pgItem': null,
             },
             {
               'pgId': 3,
               'icon': pgIcon,
               'latlng': const LatLng(12.989035016170355, 80.21580923611359),
+              'pgItem': null,
             },
           ];
 
@@ -86,6 +90,7 @@ class _MapScreenState extends State<MapScreen> {
         'pgId': -1,
         'icon': userIcon,
         'latlng': myCurrentPosition,
+        'pgItem': null,
       },
       ...getLatLngInPgList,
       // {
@@ -104,9 +109,8 @@ class _MapScreenState extends State<MapScreen> {
     for (var i = 0; i < latlngPoint.length; i++) {
       final markerIcon = latlngPoint[i]['icon'] as BitmapDescriptor;
       final position = latlngPoint[i]['latlng'] as LatLng;
-      final pgItem = widget.pgList != null && widget.pgList!.isNotEmpty
-          ? widget.pgList!.firstWhere(
-              (elem) => (elem?.pgId ?? 0) == latlngPoint[i + 1]['pgId'])
+      final pgItem = latlngPoint[i]['pgId'] != -1
+          ? latlngPoint[i]['pgItem'] as FilterPgModel?
           : null;
       markers.add(
         Marker(

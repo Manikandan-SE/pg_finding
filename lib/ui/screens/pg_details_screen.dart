@@ -161,7 +161,7 @@ class _PgDetailsScreenState extends State<PgDetailsScreen> {
 
   void makingPhoneCall() async {
     try {
-      final phone = widget.pgDetails?.owner?.ownerPhoneNumber ?? 7904696681;
+      final phone = widget.pgDetails?.pgPhoneNumber ?? 7904696681;
       var url = Uri.parse("tel:$phone");
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
