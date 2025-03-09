@@ -52,21 +52,3 @@ class PgFindingApp extends StatelessWidget {
     );
   }
 }
-
-//Firebase
-
-// {
-//   "status": "success",
-//   "result": {
-//     "@type": "type.googleapis.com/google.firebase.service.v1beta1.AndroidApp",
-//     "name": "projects/pg-finding-8c460/androidApps/1:647564243012:android:81e720a0a78f8a62a6cc11",
-//     "appId": "1:647564243012:android:81e720a0a78f8a62a6cc11",
-//     "displayName": "pg_finding",
-//     "projectId": "pg-finding-8c460",
-//     "packageName": "com.example.pg_finding",
-//     "apiKeyId": "44ffdf20-57c7-42eb-bca1-4e3d837f92a0",
-//     "state": "ACTIVE",
-//     "expireTime": "1970-01-01T00:00:00Z",
-//     "etag": "1_63dd8431-4637-4f8b-931d-f7095cf45905"
-//   }
-// }
