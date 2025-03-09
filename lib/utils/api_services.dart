@@ -12,8 +12,7 @@ class AppServices {
   //     'https://eb57-2409-4072-38c-669d-c65-8701-c208-4612.ngrok-free.app';
 
   Future<String?> fetchBaseUrl() async {
-    const String mockApiUrl =
-        'https://674c12f354e1fca9290b94ac.mockapi.io/getBaseUrl';
+    const String mockApiUrl = '';
     try {
       // Send HTTP GET request
       final response = await dio.get(mockApiUrl);

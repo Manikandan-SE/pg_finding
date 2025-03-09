@@ -14,15 +14,15 @@ void main() async {
   Platform.isAndroid
       ? await Firebase.initializeApp(
           options: const FirebaseOptions(
-            apiKey: 'AIzaSyDxeBDXUOch4Cl9mpR7x-ozCLvFcsUCt1k',
-            appId: '1:583246845024:android:57f911242c23412fe59f05',
-            messagingSenderId: '583246845024',
-            projectId: 'pg-finding-app-67303',
+            apiKey: '',
+            appId: '',
+            messagingSenderId: '',
+            projectId: '',
           ),
         )
       : await Firebase.initializeApp();
   PhoneEmail.initializeApp(
-    clientId: '13230232040355246216',
+    clientId: '',
   );
   SystemChrome.setPreferredOrientations(
     [
